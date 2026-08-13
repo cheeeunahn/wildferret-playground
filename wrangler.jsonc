@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wildferret-playground",
+  "compatibility_date": "2026-08-14",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [
+    {
+      "pattern": "playground.wildferret.dev",
+      "custom_domain": true
+    }
+  ]
+}
