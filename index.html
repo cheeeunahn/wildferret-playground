@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strudel Studio</title>
+    <script src="https://unpkg.com/@strudel/embed@latest"></script>
+    <style>
+      /* The embed hardcodes a 600x400 iframe; give it room. */
+      strudel-repl {
+        display: block;
+      }
+      strudel-repl iframe {
+        width: 100%;
+        height: 80vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
