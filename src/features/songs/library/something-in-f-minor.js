@@ -17,7 +17,7 @@ const rhKeys =
 
 const bass =
   note("<f2 f2 f2>*3 <c2 ef2 c2 [f2 f2 f2]>")
-    .sound("gm_synth_bass_1").sustain(0.3).lpf(1000).gain(1.2);
+    .sound("gm_synth_bass_1").sustain(0.3).lpf(1000).gain(1);
 
 const atmos =
   note("<f3>*4").sound("gm_fx_atmosphere").lpf(500).gain(1.3);
@@ -81,7 +81,7 @@ arrange(
     // lead recorder melody - your original 8-cycle phrase (unchanged)
     note("c5@4 bf4@2 gs4@2 g4@4 gs4@4 c5@4 bf4@2 gs4@2 ef5@4 c5@4")
       .sound("gm_recorder").slow(8).sustain(3)
-      .lpf(sine.range(900, 1800).slow(8)).gain(0.7).room(1.5),
+      .lpf(sine.range(900, 1800).slow(8)).gain(0.7).room(1),
 
     // held atmosphere pad throughout the break
     atmos.gain(0.4).slow(4),
