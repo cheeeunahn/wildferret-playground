@@ -1,7 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { Anchor, Box, Group, Text } from '@mantine/core';
 import { useDocumentTitle } from '@mantine/hooks';
-import { TOOLS } from '../tools/tools';
+import { TOOLS } from './catalog';
 
 // One tool, full window, no site chrome: /tools/<id>/
 export default function ToolPage() {

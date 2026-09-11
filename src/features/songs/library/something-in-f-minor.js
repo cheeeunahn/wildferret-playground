@@ -1,5 +1,3 @@
-// Archive of composed pieces. Add a new one by appending to PIECES below.
-
 const firstPiece = `// ============================================================
 //  Fm groove - piano theme / drop / break / theme reprise
 //  Key center: F minor
@@ -131,6 +129,8 @@ arrange(
 
 )`;
 
-export const PIECES = [
-  { id: 'first-piece', name: 'something in F minor', code: firstPiece },
-];
+export default {
+  id: 'first-piece',
+  name: 'something in F minor',
+  code: firstPiece,
+};

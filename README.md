@@ -16,22 +16,53 @@ Routing is client-side (`react-router-dom`), so `wrangler.jsonc` sets
 `not_found_handling: "single-page-application"` to serve `index.html` for
 every path.
 
-## Layout
+## Project structure
 
 ```
 src/
-  main.jsx        providers + <BrowserRouter>
-  routes.jsx      the route table
-  theme.js        Mantine theme, on the blog's palette
-  layout/         the site shell: header, nav, <Outlet>
-  pages/          one file per route
-  songs/          the piece archive and the Strudel embed
-  tools/          tools.js registry + one folder per tool
+  main.jsx                  app bootstrap and providers
+  app/                      global routing, theme, and styles
+  shared/                   UI shared by multiple features
+  features/
+    index.js                feature registry (routing + navigation)
+    songs/
+      SongsPage.jsx
+      components/           song-specific reusable UI
+      library/              song registry + one file per song
+    tools/
+      ToolsPage.jsx
+      ToolPage.jsx
+      catalog/              tool registry + one folder per tool
 ```
 
-Add a song by appending to `PIECES` in `src/songs/pieces.js`. Add a tool by
-dropping a component under `src/tools/` and appending to `TOOLS` in
-`src/tools/tools.js` — its `id` becomes the last segment of its own URL.
+The repository is organized by feature rather than by file type. A feature owns
+its pages, components, data, and feature-specific routes, which keeps unrelated
+categories from becoming coupled as the playground grows.
+
+## Adding content
+
+### A song
+
+1. Add one song module under `src/features/songs/library/` that exports its
+   `id`, `name`, and `code`.
+2. Import it in `src/features/songs/library/index.js` and append it to `SONGS`.
+
+### A tool
+
+1. Add a folder under `src/features/tools/catalog/` containing the tool's UI,
+   styles, logic, and an `index.js` metadata export.
+2. Import that metadata in `src/features/tools/catalog/index.js` and append it
+   to `TOOLS`. Its `id` becomes the last segment of `/tools/<tool-id>/`.
+
+### Another category
+
+1. Add `src/features/<category>/` with its page and an `index.js` feature
+   descriptor (`id`, `label`, `path`, and `Component`).
+2. Register the descriptor in `src/features/index.js`.
+
+The feature registry automatically supplies the main route and navigation tab.
+A feature can also declare `standaloneRoutes` when it needs routes outside the
+shared site layout, as tools currently does for the full-window tool view.
 
 ## Commands
 

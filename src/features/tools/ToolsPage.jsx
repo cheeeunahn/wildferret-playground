@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Anchor, Group, Paper, Select, Stack, Text } from '@mantine/core';
 import { useDocumentTitle } from '@mantine/hooks';
-import { TOOLS } from '../tools/tools';
+import { TOOLS } from './catalog';
 
 export default function ToolsPage() {
   useDocumentTitle("tools · wildferret's playground");

@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { Paper, Select, Text } from '@mantine/core';
 import { useDocumentTitle } from '@mantine/hooks';
-import StrudelPlayer from '../songs/StrudelPlayer';
-import { PIECES } from '../songs/pieces';
+import StrudelPlayer from './components/StrudelPlayer';
+import { SONGS } from './library';
 
 export default function SongsPage() {
   useDocumentTitle("songs · wildferret's playground");
-  const [selectedId, setSelectedId] = useState(PIECES[0]?.id ?? null);
-  const selected = PIECES.find((p) => p.id === selectedId) ?? null;
+  const [selectedId, setSelectedId] = useState(SONGS[0]?.id ?? null);
+  const selected = SONGS.find((song) => song.id === selectedId) ?? null;
 
   return (
     <>
       <Select
         label="pick a song"
         placeholder="pick a song"
-        data={PIECES.map((p) => ({ value: p.id, label: p.name }))}
+        data={SONGS.map((song) => ({ value: song.id, label: song.name }))}
         value={selectedId}
         onChange={setSelectedId}
         allowDeselect={false}

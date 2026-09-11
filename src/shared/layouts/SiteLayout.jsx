@@ -8,12 +8,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-
-// Trailing slashes, so the address bar reads /songs/ and /tools/.
-const NAV = [
-  { to: '/songs/', label: 'songs' },
-  { to: '/tools/', label: 'tools' },
-];
+import { FEATURES } from '../../features';
 
 export default function SiteLayout() {
   return (
@@ -39,10 +34,10 @@ export default function SiteLayout() {
               </Stack>
 
               <Group gap="lg" component="nav" mt={4}>
-                {NAV.map((item) => (
+                {FEATURES.map((feature) => (
                   <NavLink
-                    key={item.to}
-                    to={item.to}
+                    key={feature.id}
+                    to={`/${feature.path}/`}
                     style={({ isActive }) => ({
                       fontSize: 'var(--mantine-font-size-sm)',
                       fontWeight: isActive ? 700 : 400,
@@ -57,7 +52,7 @@ export default function SiteLayout() {
                       textDecorationColor: 'var(--mantine-color-accent-6)',
                     })}
                   >
-                    {item.label}
+                    {feature.label}
                   </NavLink>
                 ))}
               </Group>

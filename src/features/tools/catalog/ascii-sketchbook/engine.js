@@ -14,7 +14,7 @@ const CONT = '\0'; // wide-char continuation marker
 const BOX_SET = new Set('┌┐└┘─│├┤┬┴┼╔╗╚╝═║╠╣╦╩╬+');
 const B = { TL:'┌', TR:'┐', BL:'└', BR:'┘', H:'─', V:'│', TJ:'┬', BJ:'┴', LJ:'├', RJ:'┤', X:'┼' };
 
-// Canvas colours, kept in sync with the Mantine theme in src/theme.js.
+// Canvas colours, kept in sync with the Mantine theme in src/app/theme.js.
 const CC = {
   bg:    '#ffffff',
   grid:  '#e2e5ea',
