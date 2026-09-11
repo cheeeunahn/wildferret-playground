@@ -9,3 +9,8 @@ strudel-repl iframe {
   height: min(70vh, 620px);
   border: 0;
 }
+
+/* Tools lay themselves out edge to edge, so the panel just sets the viewport. */
+.wf-tool-frame {
+  height: min(78vh, 720px);
+}

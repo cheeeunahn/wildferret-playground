@@ -1,16 +1,74 @@
-# React + Vite
+# wildferret's playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A small React + Vite site at [playground.wildferret.dev](https://playground.wildferret.dev),
+deployed to Cloudflare Workers as static assets.
 
-Currently, two official plugins are available:
+## Routes
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| URL | What |
+| --- | --- |
+| `/` | redirects to `/songs/` |
+| `/songs/` | the Strudel piece archive and its player |
+| `/tools/` | the tools tab: pick a tool, use it inside the page |
+| `/tools/<tool-id>/` | one tool on its own page, without the site chrome |
 
-## React Compiler
+Routing is client-side (`react-router-dom`), so `wrangler.jsonc` sets
+`not_found_handling: "single-page-application"` to serve `index.html` for
+every path.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Project structure
 
-## Expanding the Oxlint configuration
+```
+src/
+  main.jsx                  app bootstrap and providers
+  app/                      global routing, theme, and styles
+  shared/                   UI shared by multiple features
+  features/
+    index.js                feature registry (routing + navigation)
+    songs/
+      SongsPage.jsx
+      components/           song-specific reusable UI
+      library/              song registry + one file per song
+    tools/
+      ToolsPage.jsx
+      ToolPage.jsx
+      catalog/              tool registry + one folder per tool
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+The repository is organized by feature rather than by file type. A feature owns
+its pages, components, data, and feature-specific routes, which keeps unrelated
+categories from becoming coupled as the playground grows.
+
+## Adding content
+
+### A song
+
+1. Add one song module under `src/features/songs/library/` that exports its
+   `id`, `name`, and `code`.
+2. Import it in `src/features/songs/library/index.js` and append it to `SONGS`.
+
+### A tool
+
+1. Add a folder under `src/features/tools/catalog/` containing the tool's UI,
+   styles, logic, and an `index.js` metadata export.
+2. Import that metadata in `src/features/tools/catalog/index.js` and append it
+   to `TOOLS`. Its `id` becomes the last segment of `/tools/<tool-id>/`.
+
+### Another category
+
+1. Add `src/features/<category>/` with its page and an `index.js` feature
+   descriptor (`id`, `label`, `path`, and `Component`).
+2. Register the descriptor in `src/features/index.js`.
+
+The feature registry automatically supplies the main route and navigation tab.
+A feature can also declare `standaloneRoutes` when it needs routes outside the
+shared site layout, as tools currently does for the full-window tool view.
+
+## Commands
+
+```sh
+pnpm dev        # vite dev server
+pnpm lint       # oxlint
+pnpm build      # production build into dist/
+pnpm preview    # serve the build locally
+```
