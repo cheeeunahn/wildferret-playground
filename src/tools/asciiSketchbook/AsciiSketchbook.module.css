@@ -1,0 +1,89 @@
+/* Only the canvas surface needs hand-written CSS; the chrome is Mantine. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--mantine-color-white);
+  outline: none;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.canvasWrap {
+  flex: 1;
+  overflow: auto;
+  min-width: 0;
+  background: var(--wf-paper);
+  background-image: radial-gradient(circle, var(--mantine-color-ink-2) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* The padding here is the PAD constant the engine offsets the text box by. */
+.canvasPad {
+  position: relative;
+  padding: 56px;
+  display: inline-block;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.canvas {
+  display: block;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.textbox {
+  position: absolute;
+  display: none;
+  background: var(--mantine-color-white);
+  border: 1px dashed var(--mantine-color-accent-6);
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px rgba(20, 99, 243, 0.08);
+  font-family: 'D2Coding', ui-monospace, 'SF Mono', Menlo, monospace;
+  color: var(--mantine-color-ink-9);
+  padding: 6px 10px;
+  outline: none;
+  resize: both;
+  overflow: auto;
+  white-space: pre;
+  z-index: 5;
+  caret-color: var(--mantine-color-accent-6);
+}
+
+.textbox::selection {
+  background: rgba(20, 99, 243, 0.2);
+}
+
+.panel {
+  width: 264px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--wf-hairline);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.toast {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .panel {
+    display: none;
+  }
+}

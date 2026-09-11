@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import StrudelPlayer from './StrudelPlayer';
 import { PIECES } from './pieces';
+import { TOOLS } from './tools';
 
 const NAV = [
   { id: 'songs', label: 'songs' },
@@ -22,6 +23,8 @@ export default function App() {
   const [view, setView] = useState('songs');
   const [selectedId, setSelectedId] = useState(PIECES[0]?.id ?? null);
   const selected = PIECES.find((p) => p.id === selectedId) ?? null;
+  const [toolId, setToolId] = useState(TOOLS[0]?.id ?? null);
+  const tool = TOOLS.find((t) => t.id === toolId) ?? null;
 
   return (
     <Box bg="var(--wf-paper)" mih="100vh" py={{ base: 'md', sm: 'xl' }}>
@@ -59,7 +62,9 @@ export default function App() {
                         color: active
                           ? 'var(--mantine-color-accent-6)'
                           : 'var(--mantine-color-ink-5)',
-                        textDecoration: active ? 'underline' : 'none',
+                        // Longhand, so React never rewrites the shorthand over
+                        // the other textDecoration-* values on a re-render.
+                        textDecorationLine: active ? 'underline' : 'none',
                         textDecorationThickness: 2,
                         textUnderlineOffset: 9,
                         textDecorationColor: 'var(--mantine-color-accent-6)',
@@ -105,6 +110,41 @@ export default function App() {
                   </Text>
                 )}
               </Paper>
+            </>
+          ) : TOOLS.length > 0 ? (
+            <>
+              <Select
+                label="pick a tool"
+                placeholder="pick a tool"
+                data={TOOLS.map((t) => ({ value: t.id, label: t.name }))}
+                value={toolId}
+                onChange={setToolId}
+                allowDeselect={false}
+                size="md"
+                radius="md"
+                comboboxProps={{ shadow: 'md' }}
+              />
+
+              {tool ? (
+                <Stack gap="xs">
+                  <Text size="sm" c="ink.5">
+                    {tool.description}
+                  </Text>
+
+                  <Paper
+                    bg="var(--wf-surface)"
+                    radius="lg"
+                    withBorder
+                    className="wf-tool-frame"
+                    style={{
+                      borderColor: 'var(--wf-hairline)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <tool.Component key={tool.id} />
+                  </Paper>
+                </Stack>
+              ) : null}
             </>
           ) : (
             <Paper
