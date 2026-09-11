@@ -1,7 +1,8 @@
 // Archive of tools. Add a new one by appending to TOOLS below; each entry
-// points at a React component that fills the tool panel.
+// points at a React component that fills the tool panel, and its id is the
+// last segment of the tool's own URL (/tools/<id>/).
 
-import AsciiSketchbook from './tools/asciiSketchbook/AsciiSketchbook';
+import AsciiSketchbook from './asciiSketchbook/AsciiSketchbook';
 
 export const TOOLS = [
   {
