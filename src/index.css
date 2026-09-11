@@ -1,0 +1,11 @@
+/* The <strudel-repl> embed hardcodes a 600x400 iframe; let it fill its panel. */
+strudel-repl {
+  display: block;
+}
+
+strudel-repl iframe {
+  display: block;
+  width: 100%;
+  height: min(70vh, 620px);
+  border: 0;
+}
