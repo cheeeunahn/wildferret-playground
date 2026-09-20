@@ -51,17 +51,17 @@
 @media (min-width: 62em) {
   .intro {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    /* Top, not centre: the diagram is the taller of the two, and centring the
-       prose against it opened a hole under the title. */
+    /* Top, not centre: the title leads the left column, and the diagram's
+       top edge lines up with it. Centring dropped the picture half a card. */
     align-items: start;
     gap: var(--mantine-spacing-lg);
   }
+}
 
-  /* Read the words first, then the picture — but only where they sit side by
-     side; stacked, the diagram still leads. */
-  .introText {
-    order: -1;
-  }
+/* 고른 탭이 밑줄 하나로만 갈려 있어 한눈에 잡히지 않았다. 글씨를 굵게 해
+   두면 밑줄을 보지 않아도 어느 쪽에 서 있는지 알 수 있다. */
+.tabs button[data-active] {
+  font-weight: 700;
 }
 
 /* The three primitives sit side by side, and one tagline wraps to two lines
@@ -138,7 +138,7 @@
 }
 
 .marker::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -4px;
   left: -3px;
@@ -193,15 +193,33 @@
 /* 「직접 그려보기」의 캔버스. 크기는 CSS가 정하고, 백킹 스토어는 engine.js가
    픽셀 비율에 맞춰 잡는다. touch-action을 끄지 않으면 손가락으로 긋는 동안
    페이지가 같이 스크롤돼 선이 끊긴다. */
+.padWrap {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+}
+
 .pad {
   display: block;
   width: 100%;
+  /* 답이 아직 없을 때 카드가 화면을 통째로 쓰는데, 거기에 맞춰 캔버스를
+     늘리면 4:3이 화면 한 장을 넘긴다. 폭을 여기서 끊어 둔다. */
+  max-width: 560px;
   aspect-ratio: 4 / 3;
   border: 1px dashed var(--mantine-color-ink-2);
   border-radius: 12px;
   background: var(--wf-paper);
   touch-action: none;
   cursor: crosshair;
+}
+
+.padHint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-size: var(--mantine-font-size-sm);
 }
 
 /* 보낸 값을 한 줄로 늘어놓은 요약. 가운뎃점으로 이어 붙여 놓아서, 좁은

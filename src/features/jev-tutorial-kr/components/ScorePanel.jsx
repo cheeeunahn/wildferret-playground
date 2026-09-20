@@ -1,10 +1,10 @@
-import { Box, Group, Stack, Text } from '@mantine/core';
-import PrimitiveCard from './PrimitiveCard';
-import ProbabilityBar from './ProbabilityBar';
-import classes from './Dashboard.module.css';
-import { PRIMITIVES } from '../data/samples';
+import { Box, Group, Stack, Text } from "@mantine/core";
+import PrimitiveCard from "./PrimitiveCard";
+import ProbabilityBar from "./ProbabilityBar";
+import classes from "./Dashboard.module.css";
+import { PRIMITIVES } from "../data/samples";
 
-export default function ScorePanel({ answer, question }) {
+export default function ScorePanel({ answer, question, compact = false }) {
   const levels = Object.keys(answer.legend)
     .map(Number)
     .sort((a, b) => a - b);
@@ -19,6 +19,7 @@ export default function ScorePanel({ answer, question }) {
 
   return (
     <PrimitiveCard
+      compact={compact}
       primitive={PRIMITIVES.score}
       headline={
         <Stack gap={2}>
@@ -26,7 +27,13 @@ export default function ScorePanel({ answer, question }) {
             {question.title}
           </Text>
           <Group align="baseline" gap="xs">
-            <Text fz={32} fw={700} c="accent.7" ff="monospace" lh={1.1}>
+            <Text
+              fz={compact ? 24 : 32}
+              fw={700}
+              c="accent.7"
+              ff="monospace"
+              lh={1.1}
+            >
               {answer.score.toFixed(2)}
             </Text>
             <Text size="xs" c="ink.4" ff="monospace">
@@ -38,13 +45,13 @@ export default function ScorePanel({ answer, question }) {
       notes={
         <>
           <Text size="xs" c="ink.4">
-            점수는 각 단계의 확률을 반영한 평균이다. 이 문의는 {topLevel}단계일
-            가능성이 가장 높지만, 다른 단계일 가능성도 남아 있어 최종 점수는{' '}
-            {answer.score.toFixed(2)}가 되었다.
+            각 단계의 확률을 가중 평균한 값이 점수다. 가장 유력한 단계는{" "}
+            {topLevel}이지만, 다른 단계의 가능성까지 반영되어 최종 점수는{" "}
+            {answer.score.toFixed(2)}다.
           </Text>
           <Text size="xs" c="ink.4">
-            판단 기준은 낮은 단계부터 높은 단계까지 {question.criteria.length}
-            개를 사용했다.
+            이 질문에는 낮음부터 높음까지 {question.criteria.length}개의 구체적인
+            판단 기준을 적었다.
           </Text>
         </>
       }
@@ -68,6 +75,7 @@ export default function ScorePanel({ answer, question }) {
 
       {levels.map((level) => (
         <ProbabilityBar
+          compact={compact}
           key={level}
           label={`${level} 단계`}
           value={answer.probabilities[level]}

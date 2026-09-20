@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -9,19 +9,19 @@ import {
   Tabs,
   Text,
   UnstyledButton,
-} from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import ChoicePanel from './ChoicePanel';
-import NoulPanel from './NoulPanel';
-import ScorePanel from './ScorePanel';
-import classes from './Dashboard.module.css';
-import { createDrawingPad } from '../drawing/engine';
-import { describeFeatures, extractFeatures } from '../drawing/features';
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import ChoicePanel from "./ChoicePanel";
+import NoulPanel from "./NoulPanel";
+import ScorePanel from "./ScorePanel";
+import classes from "./Dashboard.module.css";
+import { createDrawingPad } from "../drawing/engine";
+import { describeFeatures, extractFeatures } from "../drawing/features";
 import {
   buildQuestions,
   DRAWING_QUESTIONS,
   questionForDisplay,
-} from '../data/drawingQuestions';
+} from "../data/drawingQuestions";
 
 const MIN_STROKES = 2;
 
@@ -35,19 +35,19 @@ const COOLDOWN_MS = 3000;
 // 개는 고정 샘플을 읽을 때와 똑같은 코드로 진짜 응답을 그린다.
 function normalize(answers) {
   const noul = (raw) => ({
-    type: 'noul',
-    noul: typeof raw?.noul === 'number' ? raw.noul : (raw?.answer ?? 0),
+    type: "noul",
+    noul: typeof raw?.noul === "number" ? raw.noul : (raw?.answer ?? 0),
   });
 
   return {
     subject: {
-      type: 'choice',
+      type: "choice",
       choice: answers.subject.choice,
       confidence: answers.subject.confidence ?? 0,
       probabilities: answers.subject.probabilities ?? {},
     },
     catness: {
-      type: 'score',
+      type: "score",
       score: answers.catness.score,
       confidence: answers.catness.confidence ?? 0,
       legend: DRAWING_QUESTIONS.catness.legend,
@@ -123,13 +123,13 @@ export default function DrawCatPanel() {
 
     try {
       // 브라우저는 잰 숫자만 보낸다. 질문과 키는 서버가 쥐고 있다.
-      const response = await fetch('/api/jev', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const response = await fetch("/api/jev", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ features }),
       });
       const body = await response.json();
-      if (!response.ok) throw new Error(body?.error ?? '요청이 실패했다.');
+      if (!response.ok) throw new Error(body?.error ?? "요청이 실패했다.");
 
       setResult({
         answers: normalize(body.answers),
@@ -153,33 +153,40 @@ export default function DrawCatPanel() {
   }
 
   return (
-    <>
-      <Paper
-        bg="var(--wf-surface)"
-        radius="lg"
-        p={{ base: 'md', sm: 'lg' }}
-        withBorder
-        className={classes.card}
-        style={{ borderColor: 'var(--wf-hairline)' }}
-      >
-        <Text fw={700} c="ink.8" mb={4}>
-          직접 그려보기
-        </Text>
-        {/* 획이 모자라면 버튼이 잠긴다는 사실을 눌러 보고 나서야 알면 늦다.
+    <Paper
+      bg="var(--wf-surface)"
+      radius="lg"
+      p={{ base: "md", sm: "lg" }}
+      withBorder
+      className={classes.card}
+      style={{ borderColor: "var(--wf-hairline)" }}
+    >
+      <Text fw={700} c="ink.8" mb={4}>
+        직접 고양이를 그려서 Jev를 호출해보자
+      </Text>
+      {/* 획이 모자라면 버튼이 잠긴다는 사실을 눌러 보고 나서야 알면 늦다.
             조건을 처음부터 말해 두고, 아래 안내는 아직 모자랄 때만 덧붙인다. */}
-        <Text size="sm" c="ink.5" mb="md">
-          <b>고양이를 그려보자.</b> 획을 <b>{MIN_STROKES}개 이상</b> 그려야
-          Jev에게 물어볼 수 있다. 다 그렸으면 &ldquo;Jev 평가받기&rdquo;를
-          누른다. 귀를 붙이고 다시 누르고, 수염을 더하고 또 눌러 보면 같은
-          질문의 답이 어떻게 움직이는지 볼 수 있다.
-        </Text>
+      <Text size="sm" c="ink.5" mb="md">
+        아래에 고양이를 <b>{MIN_STROKES}획 이상</b>으로 그리고 &ldquo;Jev에
+        묻기&rdquo;를 눌러 보자. 귀나 수염을 더한 뒤 다시 물으면, 측정값의 변화가
+        Choice·Score·Noul 답에 어떻게 반영되는지 비교할 수 있다.
+      </Text>
 
-        <Grid gutter={{ base: 'md', sm: 'lg' }}>
-          <Grid.Col span={{ base: 12, md: 7 }}>
-            <canvas ref={canvasRef} className={classes.pad} />
-          </Grid.Col>
+      {/* 그림과 그 답은 한눈에 견주어야 한다. 답을 카드 아래에 이어 붙였더니
+          획을 고칠 때마다 스크롤을 오르내려야 했다. 한 카드 안에서 왼쪽에
+          그리고, 오른쪽에서 답이 바뀌는 것을 그대로 본다. */}
+      <Grid gutter={{ base: "md", sm: "lg" }} align="stretch">
+        <Grid.Col span={result ? { base: 12, md: 6 } : 12}>
+          <Stack gap="md">
+            <Box className={classes.padWrap}>
+              <canvas ref={canvasRef} className={classes.pad} />
+              {strokes.length === 0 ? (
+                <Text className={classes.padHint} c="ink.4">
+                  고양이를 여기에 그려보자
+                </Text>
+              ) : null}
+            </Box>
 
-          <Grid.Col span={{ base: 12, md: 5 }}>
             <Stack gap="sm">
               <Group gap="xs">
                 <Button
@@ -189,7 +196,7 @@ export default function DrawCatPanel() {
                   loading={loading}
                   disabled={!enough || locked}
                 >
-                  Jev 평가받기
+                  Jev에 묻기
                 </Button>
                 <Button
                   variant="default"
@@ -216,19 +223,18 @@ export default function DrawCatPanel() {
 
               {!enough ? (
                 <Text size="xs" c="ink.4">
-                  조금 더 그려보자. 획이 {MIN_STROKES}개는 되어야 보낼 것이
-                  생긴다.
+                  {MIN_STROKES}획 이상 그리면 Jev에 물어볼 수 있다.
                 </Text>
               ) : cooldown > 0 ? (
                 <Text size="xs" c="ink.4">
-                  너무 자주 묻지 않도록 {COOLDOWN_MS / 1000}초에 한 번만 보낸다.{' '}
-                  {cooldown}초 뒤에 다시 누를 수 있다.
+                  호출 간격은 {COOLDOWN_MS / 1000}초다. {cooldown}초 뒤에 다시
+                  물어볼 수 있다.
                 </Text>
               ) : null}
 
               {error ? (
                 <Text size="xs" c="ink.4">
-                  물어보지 못했다 · {error}
+                  호출하지 못했습니다 · {error}
                 </Text>
               ) : null}
 
@@ -236,113 +242,120 @@ export default function DrawCatPanel() {
                   이 숫자들까지가 브라우저의 몫이고, 그다음부터가 Jev의 몫이다. */}
               <Stack gap={4}>
                 <Text size="xs" fw={600} c="ink.6">
-                  코드가 재어 보낼 값
+                  브라우저가 계산한 측정값
                 </Text>
                 <Text size="xs" c="ink.4" className={classes.featureLine}>
-                  {features ? describeFeatures(features) : '아직 없음'}
+                  {features ? describeFeatures(features) : "아직 없음"}
                 </Text>
               </Stack>
 
               <Text size="xs" c="ink.4">
-                Jev는 그림을 보지 못한다. 텍스트만 읽는 모델이라, 캔버스 대신 위
-                숫자가 올라간다. 재는 일은 코드가, 그 숫자가 고양이처럼 보이는지
-                판단하는 일은 Jev가 한다.
+                Jev에 그림 파일을 보내는 것은 아니다. 브라우저가 획의 모양을 위
+                숫자로 바꾸고, Jev는 그 숫자를 바탕으로 질문에 답한다.
               </Text>
             </Stack>
-          </Grid.Col>
-        </Grid>
+          </Stack>
+        </Grid.Col>
 
+        {/* 답 네 장이 그림 옆 반쪽에 들어간다. 글씨는 그만큼 작아지지만,
+            획을 고치고 숫자가 움직이는 것을 같은 화면에서 본다. */}
         {result ? (
-          <Box
-            pt="xs"
-            mt="md"
-            style={{ borderTop: '1px solid var(--wf-hairline)' }}
-          >
-            <UnstyledButton
-              onClick={togglePayload}
-              w="100%"
-              aria-expanded={showPayload}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid
+              gutter="md"
+              align="stretch"
+              className={loading ? classes.pending : undefined}
             >
-              <Group justify="space-between" wrap="nowrap" gap="xs">
-                <Text size="xs" c="ink.6" fw={600}>
-                  실제로 오간 요청과 응답
-                </Text>
-                <Text size="xs" c="ink.5">
-                  {showPayload ? '접기 ▲' : '펼치기 ▼'}
-                </Text>
-              </Group>
-            </UnstyledButton>
-
-            {showPayload ? (
-              <Tabs
-                defaultValue="request"
-                variant="pills"
-                color="accent"
-                radius="md"
-                pt="sm"
-              >
-                <Tabs.List mb="sm">
-                  <Tabs.Tab value="request">보낸 요청</Tabs.Tab>
-                  <Tabs.Tab value="response">받은 응답</Tabs.Tab>
-                </Tabs.List>
-
-                <Tabs.Panel value="request">
-                  <pre className={classes.code}>
-                    {JSON.stringify(
-                      {
-                        model: 'jev-latest',
-                        state: { 측정값: result.features },
-                        questions: buildQuestions(),
-                      },
-                      null,
-                      2,
-                    )}
-                  </pre>
-                </Tabs.Panel>
-
-                <Tabs.Panel value="response">
-                  <pre className={classes.code}>
-                    {JSON.stringify(result.raw, null, 2)}
-                  </pre>
-                </Tabs.Panel>
-              </Tabs>
-            ) : null}
-          </Box>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <ChoicePanel
+                  compact
+                  answer={result.answers.subject}
+                  question={questionForDisplay("subject")}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <ScorePanel
+                  compact
+                  answer={result.answers.catness}
+                  question={questionForDisplay("catness")}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <NoulPanel
+                  compact
+                  answer={result.answers.ears}
+                  question={questionForDisplay("ears")}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <NoulPanel
+                  compact
+                  answer={result.answers.whiskers}
+                  question={questionForDisplay("whiskers")}
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
         ) : null}
-      </Paper>
+      </Grid>
 
       {result ? (
-        <Grid
-          gutter={{ base: 'md', sm: 'lg' }}
-          align="stretch"
-          className={loading ? classes.pending : undefined}
+        <Box
+          pt="xs"
+          mt="md"
+          style={{ borderTop: "1px solid var(--wf-hairline)" }}
         >
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ChoicePanel
-              answer={result.answers.subject}
-              question={questionForDisplay('subject')}
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <ScorePanel
-              answer={result.answers.catness}
-              question={questionForDisplay('catness')}
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <NoulPanel
-              answer={result.answers.ears}
-              question={questionForDisplay('ears')}
-            />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <NoulPanel
-              answer={result.answers.whiskers}
-              question={questionForDisplay('whiskers')}
-            />
-          </Grid.Col>
-        </Grid>
+          <UnstyledButton
+            onClick={togglePayload}
+            w="100%"
+            aria-expanded={showPayload}
+          >
+            <Group justify="space-between" wrap="nowrap" gap="xs">
+              <Text size="xs" c="ink.6" fw={600}>
+                이번 호출의 요청과 응답
+              </Text>
+              <Text size="xs" c="ink.5">
+                {showPayload ? "접기 ▲" : "펼치기 ▼"}
+              </Text>
+            </Group>
+          </UnstyledButton>
+
+          {showPayload ? (
+            <Tabs
+              defaultValue="request"
+              variant="pills"
+              color="accent"
+              radius="md"
+              pt="sm"
+            >
+              <Tabs.List mb="sm">
+                <Tabs.Tab value="request">요청</Tabs.Tab>
+                <Tabs.Tab value="response">응답</Tabs.Tab>
+              </Tabs.List>
+
+              <Tabs.Panel value="request">
+                <pre className={classes.code}>
+                  {JSON.stringify(
+                    {
+                      model: "jev-latest",
+                      state: { 측정값: result.features },
+                      questions: buildQuestions(),
+                    },
+                    null,
+                    2,
+                  )}
+                </pre>
+              </Tabs.Panel>
+
+              <Tabs.Panel value="response">
+                <pre className={classes.code}>
+                  {JSON.stringify(result.raw, null, 2)}
+                </pre>
+              </Tabs.Panel>
+            </Tabs>
+          ) : null}
+        </Box>
       ) : null}
-    </>
+    </Paper>
   );
 }

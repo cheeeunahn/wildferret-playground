@@ -1,9 +1,9 @@
-import { Group, Stack, Text } from '@mantine/core';
-import PrimitiveCard from './PrimitiveCard';
-import ProbabilityBar from './ProbabilityBar';
-import { PRIMITIVES } from '../data/samples';
+import { Group, Stack, Text } from "@mantine/core";
+import PrimitiveCard from "./PrimitiveCard";
+import ProbabilityBar from "./ProbabilityBar";
+import { PRIMITIVES } from "../data/samples";
 
-export default function ChoicePanel({ answer, question }) {
+export default function ChoicePanel({ answer, question, compact = false }) {
   // Highest probability first, so the picked option heads the list and the
   // runner-up — what Jev was torn with — sits right under it.
   const ranked = Object.entries(answer.probabilities).sort(
@@ -12,6 +12,7 @@ export default function ChoicePanel({ answer, question }) {
 
   return (
     <PrimitiveCard
+      compact={compact}
       primitive={PRIMITIVES.choice}
       headline={
         <Stack gap={2}>
@@ -19,7 +20,13 @@ export default function ChoicePanel({ answer, question }) {
             {question.title}
           </Text>
           <Group align="baseline" gap="xs">
-            <Text fz={32} fw={700} c="accent.7" ff="monospace" lh={1.1}>
+            <Text
+              fz={compact ? 24 : 32}
+              fw={700}
+              c="accent.7"
+              ff="monospace"
+              lh={1.1}
+            >
               {answer.choice}
             </Text>
             <Text size="xs" c="ink.4" ff="monospace">
@@ -30,13 +37,14 @@ export default function ChoicePanel({ answer, question }) {
       }
       notes={
         <Text size="xs" c="ink.4">
-          모든 확률의 합은 100%다. 확신도는 결과가 한쪽으로 얼마나 뚜렷하게
-          기울었는지를 보여 주며, 정답률과는 다르다.
+          가장 확률이 높은 선택지가 답이 된다. 확신도는 선택지 사이의 우열이
+          얼마나 뚜렷한지를 나타내며, 정답일 확률과는 다르다.
         </Text>
       }
     >
       {ranked.map(([option, probability]) => (
         <ProbabilityBar
+          compact={compact}
           key={option}
           label={option}
           value={probability}
