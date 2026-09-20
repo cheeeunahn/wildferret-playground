@@ -1,0 +1,178 @@
+/* This page is read, not scanned, and a lot of it is Korean prose set at
+   Mantine's smaller sizes. Rather than hand-tune every Text, the whole page
+   redefines the size and spacing scales; every `size="xs"`, `gap="md"` or
+   `p="lg"` below resolves against these. */
+.page {
+  --mantine-font-size-xs: 0.875rem;
+  --mantine-font-size-sm: 1rem;
+  --mantine-font-size-md: 1.125rem;
+  --mantine-font-size-lg: 1.25rem;
+  --mantine-font-size-xl: 1.375rem;
+
+  /* Hangul needs more leading than Latin at the same size. */
+  --mantine-line-height-xs: 1.65;
+  --mantine-line-height-sm: 1.7;
+  --mantine-line-height-md: 1.75;
+
+  /* Roomier than the Mantine default at every step: the cards are dense with
+     numbers and prose, and they need the air more than they need the width. */
+  --mantine-spacing-xs: 0.75rem;
+  --mantine-spacing-sm: 1rem;
+  --mantine-spacing-md: 1.25rem;
+  --mantine-spacing-lg: 1.75rem;
+  --mantine-spacing-xl: 2.5rem;
+}
+
+/* Phones get the same scale one step tighter: the prose still needs its
+   leading, but 1.75rem of padding on a 360px card eats the content. */
+@media (max-width: 47.99em) {
+  .page {
+    --mantine-spacing-md: 1rem;
+    --mantine-spacing-lg: 1.25rem;
+    --mantine-spacing-xl: 1.75rem;
+  }
+}
+
+/* The card every panel sits in. Its padding stays on Paper's own `p` prop —
+   Mantine's padding rule outranks this class — so all this adds is the full
+   height that lets the three primitives line up top and bottom. */
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Intro: prose beside the diagram once there is room for both. */
+.intro {
+  display: grid;
+  gap: var(--mantine-spacing-md);
+}
+
+@media (min-width: 62em) {
+  .intro {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: center;
+    gap: var(--mantine-spacing-lg);
+  }
+
+  /* Read the words first, then the picture — but only where they sit side by
+     side; stacked, the diagram still leads. */
+  .introText {
+    order: -1;
+  }
+}
+
+/* One routing rule: the condition and what it does, with its verdict badge
+   off to the right. Too narrow for two columns, the badge moves above the
+   rule and reads as its status line instead of crowding the monospace. */
+.rule {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--mantine-spacing-sm);
+}
+
+@media (max-width: 47.99em) {
+  .rule {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* A probability row: label on the left, a track that fills to the share. */
+.track {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--mantine-color-ink-1);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--mantine-color-accent-6);
+  /* Distributions change when another sample is picked; let the bar move. */
+  transition: width 220ms ease;
+}
+
+.fillMuted {
+  background: var(--mantine-color-ink-3);
+}
+
+/* The Score ruler: one band per level, with the weighted mean marked on top. */
+.ruler {
+  position: relative;
+  display: flex;
+  gap: 3px;
+  height: 26px;
+}
+
+.band {
+  flex: 1;
+  border-radius: 6px;
+  background: var(--mantine-color-ink-1);
+}
+
+.marker {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: var(--mantine-color-accent-6);
+  transition: left 220ms ease;
+}
+
+.marker::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--mantine-color-accent-6);
+}
+
+.code {
+  margin: 0;
+  padding: var(--mantine-spacing-sm);
+  border-radius: 12px;
+  background: var(--mantine-color-ink-0);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--mantine-color-ink-7);
+  /* The payload runs past 100 lines: bound it and let it scroll, rather than
+     pushing the rest of the page a screenful down. Lines keep their indent
+     and scroll sideways instead of wrapping into nonsense. */
+  max-height: min(60vh, 460px);
+  overflow: auto;
+  white-space: pre;
+  tab-size: 2;
+  /* Horizontal only: sideways flicks must not trigger back-navigation, but a
+     wheel that reaches the bottom should go on scrolling the page. */
+  overscroll-behavior-x: contain;
+}
+
+@media (max-width: 47.99em) {
+  .code {
+    font-size: 0.8125rem;
+    max-height: 340px;
+  }
+}
+
+.introDiagram {
+  width: 100%;
+  max-width: 560px;
+  margin: 0;
+  /* Reserve the box before the image lands, so the prose does not jump. */
+  aspect-ratio: 3 / 2;
+}
+
+@media (min-width: 62em) {
+  .introDiagram {
+    max-width: 100%;
+  }
+}
