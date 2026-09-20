@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .wrangler
+
+# Local secrets for wrangler and the vite dev proxy
+.dev.vars
