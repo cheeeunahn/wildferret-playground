@@ -2,9 +2,15 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "wildferret-playground",
   "compatibility_date": "2026-08-14",
+  "main": "./worker/index.js",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    // 자산이 먼저 응답하는 것이 기본인데, not_found_handling이 단일 페이지
+    // 앱이라 어떤 경로든 index.html로 받아 버린다. /api/* 만은 Worker가 먼저
+    // 보게 해야 한다.
+    "run_worker_first": ["/api/*"]
   },
   "routes": [
     {
@@ -12,4 +18,6 @@
       "custom_domain": true
     }
   ]
+  // TYPESAFE_API_KEY는 암호화된 secret으로 둔다(`wrangler secret put`).
+  // 이 파일은 커밋되므로 vars에 적으면 안 된다.
 }

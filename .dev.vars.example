@@ -1,0 +1,15 @@
+# 이 파일을 .dev.vars로 복사한 뒤 진짜 키를 채운다. .dev.vars는 git에 올라가지
+# 않으며, `pnpm dev`(vite.config.js의 개발 프록시)와 `pnpm wrangler dev`가
+# 같은 파일 하나를 읽는다.
+#
+#   cp .dev.vars.example .dev.vars
+#
+# 배포판 키는 여기가 아니라 암호화된 Worker secret으로 넣는다:
+#
+#   pnpm wrangler secret put TYPESAFE_API_KEY
+#
+# 키는 https://typesafe.ai 계정에서 발급한다. 키가 없어도 페이지는 뜨고,
+# 「Jev 평가받기」를 누르면 서버에 키가 없다는 메시지가 뜬다.
+
+TYPESAFE_API_KEY=
+
