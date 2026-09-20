@@ -22,7 +22,7 @@ export default function ScorePanel({ answer, question }) {
       primitive={PRIMITIVES.score}
       headline={
         <Stack gap={2}>
-          <Text size="xs" c="ink.4">
+          <Text size="xs" c="ink.6" fw={600}>
             {question.title}
           </Text>
           <Group align="baseline" gap="xs">

@@ -51,7 +51,9 @@
 @media (min-width: 62em) {
   .intro {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    align-items: center;
+    /* Top, not centre: the diagram is the taller of the two, and centring the
+       prose against it opened a hole under the title. */
+    align-items: start;
     gap: var(--mantine-spacing-lg);
   }
 
@@ -59,6 +61,17 @@
      side; stacked, the diagram still leads. */
   .introText {
     order: -1;
+  }
+}
+
+/* The three primitives sit side by side, and one tagline wraps to two lines
+   where the others take one — which pushed that card's answer a line lower
+   than its neighbours'. Reserving both lines lines the three numbers up.
+   Only where the cards are actually in a row; stacked, it would just be a
+   blank line. */
+@media (min-width: 62em) {
+  .tagline {
+    min-height: 2lh;
   }
 }
 

@@ -36,7 +36,7 @@ export default function PrimitiveCard({ primitive, headline, notes, children }) 
               {primitive.korean}
             </Text>
           </Group>
-          <Text size="sm" c="ink.5">
+          <Text size="xs" c="ink.5" className={classes.tagline}>
             {primitive.tagline}
           </Text>
         </Stack>

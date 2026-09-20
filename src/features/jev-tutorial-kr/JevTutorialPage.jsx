@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Anchor,
   Grid,
-  Group,
   Image,
   Paper,
   SegmentedControl,
@@ -39,7 +38,8 @@ export default function JevTutorialPage() {
         style={{ borderColor: 'var(--wf-hairline)' }}
       >
         <Stack gap="sm">
-          <Title order={2} c="ink.9" fz={{ base: '1.25rem', sm: '1.5rem' }}>
+          {/* The only heading on the page: BareLayout draws no site header. */}
+          <Title order={1} c="ink.9" fz={{ base: '1.375rem', sm: '1.625rem' }}>
             Jev 동작 방식 알아보기
           </Title>
 
@@ -105,14 +105,9 @@ export default function JevTutorialPage() {
           </Stack>
 
           <Stack gap={4}>
-            <Group gap="xs">
-              <Text size="xs" c="ink.4">
-                {sample.ticket.channel}
-              </Text>
-              <Text size="xs" c="ink.4">
-                {sample.ticket.customer}
-              </Text>
-            </Group>
+            <Text size="xs" c="ink.4">
+              {sample.ticket.channel}
+            </Text>
             <Text size="sm" c="ink.8" style={{ lineHeight: 1.7 }}>
               &ldquo;{sample.ticket.text}&rdquo;
             </Text>
