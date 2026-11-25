@@ -1,0 +1,105 @@
+name: Claude Code Review
+
+# Reviews every pull request with Claude Code and posts the findings as
+# inline comments plus one summary comment. Modelled on wildferret-blog's
+# workflow of the same name.
+#
+# Needs a CLAUDE_CODE_OAUTH_TOKEN repository secret (create one with
+# `claude setup-token`). Without it the review step fails and the rest of
+# the PR is unaffected.
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  claude-review:
+    # claude-code-action refuses to run when a bot triggers the workflow, so
+    # skip those runs instead of failing them. A human pushing to a bot's PR
+    # still gets a review.
+    if: github.event.sender.type != 'Bot'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required so Claude can post its review comments
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Full history so the review can diff against the base branch.
+          fetch-depth: 0
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
+          plugins: 'code-review@claude-code-plugins'
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Run `/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }} --comment`
+            to review this pull request thoroughly. The `--comment` flag makes the
+            review post each finding as an inline comment anchored to its line in
+            the Files changed tab.
+
+            Read the PR description first (`gh pr view ${{ github.event.pull_request.number }} --repo ${{ github.repository }}`)
+            and treat it as the author's stated intent; a mismatch between that
+            intent and the diff is a finding.
+
+            This repo is a small React + Vite playground deployed to Cloudflare
+            Workers as static assets. Read README.md for its layout: it is
+            organised by feature under `src/features/`, and each feature owns its
+            pages, components, data and routes. In `src/features/otaku-diary/`,
+            `domain/` holds pure rules with no React or browser APIs, `data/` is
+            the only code that knows where data lives, and screens get state from
+            hooks rather than touching storage. Before judging a changed hunk, read
+            the full file it lives in and the files it calls into.
+
+            Cover, in this order of priority:
+            1. Correctness — logic errors, unhandled edge cases, null/undefined
+               paths, async and state-update races
+            2. Regressions — behaviour this PR changes for existing routes and
+               features, and for the Cloudflare Workers deploy (`wrangler.jsonc`)
+            3. Project conventions — the feature layout and layering above
+            4. Security — XSS, unsafe URL handling, secrets in committed files,
+               dependency risk
+            5. Performance — unnecessary re-renders, repeated work, bundle and
+               asset weight on a phone
+            6. Maintainability — duplicated logic, dead code, naming, missing
+               error states
+
+            For every finding give: the `file:line`, what is wrong, a concrete
+            scenario in which it produces the wrong result, and a suggested fix as
+            a code block. Skip nitpicks that do not change behaviour, readability,
+            or safety.
+
+            If `--comment` cannot place a finding inline (GitHub only accepts
+            comments on lines in the diff), post it on the nearest changed line in
+            the same file and say which line it really refers to. If it cannot be
+            anchored at all, carry it into the summary comment instead.
+
+            Then post one summary comment on the PR using:
+            `gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body-file <path>`
+            (write the body to a file first so markdown and backticks survive).
+
+            Structure that summary as:
+            - **Summary** — a short paragraph on what the PR does and its state
+            - **Findings** — one line per finding (`file:line` + severity + a few
+              words); full detail only for findings that could not be anchored
+            - **PR description** — one line on whether it matches the diff
+            - **What looks good** — one or two lines
+
+            The summary comment is REQUIRED on every run, even when the review
+            finds nothing: then say so, list what you checked, and write "No
+            issues found" under **Findings**. Never leave more than one summary
+            comment.
+          claude_args: >-
+            --model claude-opus-5-5
+            --allowed-tools "Read,Grep,Glob,Write,Bash(gh pr comment:*),Bash(gh pr review:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh api:*),Bash(git diff:*),Bash(git log:*)"
+            --max-turns 80
