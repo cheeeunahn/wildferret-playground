@@ -1,0 +1,132 @@
+/* Sprite positions are percentages of the screen, tuned to the empty wall
+   and floor that bg-room.jpg leaves for them. */
+.screen {
+  --shelf-left: 0%;
+  --shelf-bottom: 29%;
+  --shelf-width: 50%;
+  --chibi-right: 10%;
+  --chibi-bottom: 6%;
+  --chibi-width: 40%;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(#fdf8f3, #f1e6da) center / cover;
+}
+
+.header {
+  position: absolute;
+  inset: calc(12px + env(safe-area-inset-top)) 14px auto;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.back,
+.place {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  color: #2b3350;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgb(60 40 30 / 0.18);
+}
+
+.back {
+  cursor: pointer;
+}
+
+.place {
+  color: #ff5a96;
+}
+
+.bookshelf {
+  position: absolute;
+  left: var(--shelf-left);
+  bottom: var(--shelf-bottom);
+  width: var(--shelf-width);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bookshelf img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgb(60 40 30 / 0.25));
+  transition: scale 0.15s ease;
+}
+
+.bookshelf:active img {
+  scale: 0.97;
+}
+
+.tag {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff8fb8, #ff6fa3);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  translate: -50% 0;
+  box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
+  animation: hint 1.8s ease-in-out infinite;
+}
+
+.shelfFallback {
+  display: block;
+  aspect-ratio: 8 / 11;
+  border: 6px solid #fff;
+  border-radius: 10px;
+  background: repeating-linear-gradient(#e9d9c8 0 6px, #ffd3e2 6px 22%);
+}
+
+.chibi {
+  position: absolute;
+  right: var(--chibi-right);
+  bottom: var(--chibi-bottom);
+  display: flex;
+  width: var(--chibi-width);
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.chibi img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 8px 8px rgb(60 40 30 / 0.22));
+}
+
+.chibiFallback {
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffb7d2;
+}
+
+.line {
+  font-size: 13px;
+}
+
+@keyframes hint {
+  50% {
+    translate: -50% -4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag {
+    animation: none;
+  }
+}

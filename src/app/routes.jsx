@@ -1,5 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { DEFAULT_FEATURE, FEATURES, UNLISTED_PAGES } from '../features';
+import {
+  DEFAULT_FEATURE,
+  FEATURES,
+  STANDALONE_PAGES,
+  UNLISTED_PAGES,
+} from '../features';
 import BareLayout from '../shared/layouts/BareLayout';
 import SiteLayout from '../shared/layouts/SiteLayout';
 import NotFoundPage from '../shared/pages/NotFoundPage';
@@ -30,6 +35,10 @@ export default function AppRoutes() {
           <Route key={path} path={path} element={<Component />} />
         ),
       )}
+
+      {STANDALONE_PAGES.map(({ id, path, Component }) => (
+        <Route key={id} path={path} element={<Component />} />
+      ))}
     </Routes>
   );
 }

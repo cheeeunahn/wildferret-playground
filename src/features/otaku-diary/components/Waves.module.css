@@ -1,0 +1,53 @@
+/* Each strip straddles the waterline; the flat water below starts where the
+   strip ends, in the same colour, so the two read as one body. */
+.layer {
+  position: absolute;
+  top: calc(var(--waterline) - 14px);
+  left: 0;
+  width: 100%;
+  height: 28px;
+  overflow: visible;
+  pointer-events: none;
+  transition: top var(--dive);
+}
+
+.crest {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.layer[data-layer='far'] {
+  top: calc(var(--waterline) - 19px);
+  z-index: 1;
+}
+.layer[data-layer='far'] .body {
+  fill: color-mix(in srgb, var(--sea-top) 55%, #fff);
+}
+.layer[data-layer='far'] .crest {
+  stroke: rgb(255 255 255 / 0.5);
+  stroke-width: 1;
+}
+
+.layer[data-layer='mid'] {
+  z-index: 1;
+}
+.layer[data-layer='mid'] .body {
+  fill: var(--sea-top);
+}
+.layer[data-layer='mid'] .crest {
+  stroke: rgb(255 255 255 / 0.65);
+  stroke-width: 1.5;
+}
+
+/* In front of the submarine: translucent, with the brightest foam line. */
+.layer[data-layer='near'] {
+  z-index: 3;
+}
+.layer[data-layer='near'] .body {
+  fill: var(--sea-front);
+}
+.layer[data-layer='near'] .crest {
+  stroke: rgb(255 255 255 / 0.9);
+  stroke-width: 2;
+}
