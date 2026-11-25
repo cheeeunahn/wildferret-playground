@@ -1,64 +1,95 @@
-// The only file that knows the diary lives in localStorage. Every method is
-// async so a server-backed version can replace it without touching callers:
-// each one maps to a single request and resolves to the whole diary.
+// The only file that knows the diary lives on our server (worker/diary.js).
+// Every method is one request and resolves to the whole diary,
+// `{ profile, records }`. The visitor is recognised by an HttpOnly cookie
+// the server sets, so there is no id to handle here.
 
 import { normalizeReview } from '../domain/review';
 
-const KEY = 'otaku-diary:v1';
-const EMPTY = { profile: { nickname: '', onboarded: false }, records: [] };
+const API = '/api/diary';
+// Where the diary lived before the server: imported once, then set aside.
+const LOCAL_KEY = 'otaku-diary:v1';
+const IMPORTED_KEY = 'otaku-diary:v1:imported';
 
-function read() {
+async function call(method, path = '', body) {
+  let response;
   try {
-    const stored = JSON.parse(localStorage.getItem(KEY));
-    return stored ? { ...EMPTY, ...stored } : EMPTY;
+    response = await fetch(API + path, {
+      method,
+      headers: body ? { 'content-type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
   } catch {
-    return EMPTY;
+    throw new Error('서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.');
+  }
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data) {
+    throw new Error(data?.error || '서버에 문제가 생겼어요. 잠시 후 다시 시도해 주세요.');
+  }
+  return data;
+}
+
+// Requests go out one at a time, in the order they were made. A visitor gets
+// their cookie on the first write; two first writes at once would create two
+// diaries.
+let queue = Promise.resolve();
+function inOrder(task) {
+  const result = queue.then(task);
+  queue = result.catch(() => {});
+  return result;
+}
+
+function readLocal() {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    const diary = raw && JSON.parse(raw);
+    const hasContent = diary?.records?.length > 0 || diary?.profile?.onboarded || diary?.profile?.nickname;
+    return hasContent ? { raw, diary } : null;
+  } catch {
+    return null;
   }
 }
 
-function write(diary) {
+// A diary recorded in this browser before the server existed is sent up
+// once. The server merges it without overwriting anything, and the local
+// copy is kept under another key rather than deleted.
+async function importLocal(local) {
+  const diary = await call('POST', '/import', {
+    profile: local.diary.profile ?? {},
+    records: local.diary.records ?? [],
+  });
   try {
-    localStorage.setItem(KEY, JSON.stringify(diary));
+    localStorage.setItem(IMPORTED_KEY, local.raw);
+    localStorage.removeItem(LOCAL_KEY);
   } catch {
-    // Private windows may refuse storage; the session still works in memory.
+    // Importing again later is harmless.
   }
   return diary;
 }
 
 export const diaryRepository = {
-  async load() {
-    return read();
+  load() {
+    return inOrder(() => {
+      const local = readLocal();
+      return local ? importLocal(local) : call('GET');
+    });
   },
 
-  async saveProfile(patch) {
-    const diary = read();
-    return write({ ...diary, profile: { ...diary.profile, ...patch } });
+  saveProfile(patch) {
+    return inOrder(() => call('PATCH', '/profile', patch));
   },
 
   // Newest first. Adding a title twice keeps the first record. `review` is
   // `{ rating, comment }`; rejects if the rating is not 1–5.
-  async addRecord(anime, review) {
-    const fields = normalizeReview(review);
-    const diary = read();
-    if (diary.records.some((r) => r.id === anime.id)) return diary;
-    const record = { ...anime, ...fields, recordedAt: new Date().toISOString() };
-    return write({ ...diary, records: [record, ...diary.records] });
+  addRecord(anime, review) {
+    return inOrder(() => call('POST', '/records', { anime, review: normalizeReview(review) }));
   },
 
   // Replaces the rating and comment of a title already recorded.
-  async saveReview(animeId, review) {
-    const fields = normalizeReview(review);
-    const diary = read();
-    const records = diary.records.map((r) => (r.id === animeId ? { ...r, ...fields } : r));
-    return write({ ...diary, records });
+  saveReview(animeId, review) {
+    return inOrder(() => call('PUT', `/records/${animeId}/review`, normalizeReview(review)));
   },
 
-  async reset() {
-    try {
-      localStorage.removeItem(KEY);
-    } catch {
-      // Nothing stored, nothing to clear.
-    }
-    return EMPTY;
+  reset() {
+    return inOrder(() => call('DELETE'));
   },
 };

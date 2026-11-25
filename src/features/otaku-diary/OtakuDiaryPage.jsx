@@ -69,6 +69,8 @@ export default function OtakuDiaryPage() {
         {screen === 'title' && (
           <TitleScreen
             disabled={diary.loading}
+            error={diary.error}
+            onRetry={diary.reload}
             onStart={() => setScreen(diary.profile.onboarded ? 'main' : 'onboarding')}
           />
         )}

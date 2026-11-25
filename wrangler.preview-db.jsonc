@@ -1,0 +1,16 @@
+{
+  // `pnpm db:migrate:preview` 전용. wrangler의 마이그레이션 명령은 최상위
+  // d1_databases만 보는데, 프리뷰 DB는 wrangler.jsonc의 `previews` 안에만
+  // 있어서 이 파일로 가리킨다. 배포에는 쓰이지 않는다.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wildferret-playground",
+  "compatibility_date": "2026-08-14",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wildferret-playground-preview",
+      "database_id": "9bc1ae09-5800-4bca-815d-f3cab3e14c1b",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

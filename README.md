@@ -1,7 +1,8 @@
 # wildferret's playground
 
 A small React + Vite site at [playground.wildferret.dev](https://playground.wildferret.dev),
-deployed to Cloudflare Workers as static assets.
+deployed to Cloudflare Workers: static assets, plus a small Worker behind
+`/api/*` that keeps the anime diary in a D1 database.
 
 ## Routes
 
@@ -15,7 +16,8 @@ deployed to Cloudflare Workers as static assets.
 
 Routing is client-side (`react-router-dom`), so `wrangler.jsonc` sets
 `not_found_handling: "single-page-application"` to serve `index.html` for
-every path.
+every path. `/api/*` is the exception: `run_worker_first` sends it to the
+Worker.
 
 ## Project structure
 
@@ -35,6 +37,8 @@ src/
       ToolPage.jsx
       catalog/              tool registry + one folder per tool
     otaku-diary/            the anime diary (see below)
+worker/                     the Worker behind /api/* (the diary API)
+migrations/                 the D1 tables, one SQL file per change
 scripts/
   kotori-voice.mjs          regenerates the diary's voice clips
 .github/workflows/
@@ -81,7 +85,7 @@ navigation: `UNLISTED_PAGES` sit inside the site frame, and
 A front-end prototype of 애니와 함께하는 바다모험: the user logs anime they have
 watched, and a submarine dives one step deeper for each title. 코토리, the
 guide character, walks them through it in visual-novel scenes and speaks every
-line in Japanese while the text stays Korean. There is no backend yet.
+line in Japanese while the text stays Korean.
 
 The flow: title screen → onboarding (nickname, first search, first dive) →
 코토리 invites the user into the submarine → a café inside it, whose bookshelf
@@ -95,7 +99,7 @@ src/features/otaku-diary/
                             depth, onboarding steps, search ranking,
                             the café lines and the Japanese voice script
   data/                     the only code that knows where data lives:
-                            AniList for anime, localStorage for the diary
+                            AniList for anime, our /api/diary for the diary
   hooks/                    state for screens (diary, search, sound, …)
   screens/                  title, onboarding, sea, café, bookshelf
   components/               dialogue box, character, sea scene, sea life, …
@@ -103,13 +107,22 @@ src/features/otaku-diary/
 ```
 
 Screens get their state from hooks and never touch storage or the network
-themselves. Both repositories in `data/` are async, so a server can replace
-them without changing the screens.
+themselves; only the repositories in `data/` do.
 
 **Data.** Anime come from the public [AniList](https://anilist.co) API, called
 from the browser (credited in the UI). The 200 most popular titles are fetched
 once and cached for a week, so a search returns results from its first letter.
-The nickname and the recorded anime live in the visitor's `localStorage`.
+
+**The diary's backend.** The nickname and the recorded anime live in a
+Cloudflare D1 database, behind `/api/diary` (routes are listed at the top of
+`worker/diary.js`). There is no login yet: a visitor is recognised by a random
+token in an HttpOnly cookie, set on their first write, and the database keeps
+only the token's hash. So a diary belongs to one browser for now. The tables
+keep users, sessions and login identities apart (`migrations/0001_diary.sql`),
+so that a login provider such as Kakao can later attach to an existing diary.
+A diary recorded in `localStorage` before the backend existed is sent to the
+server once, on the next visit, and merged.
+
 Tapping a title on the bookshelf opens its details: AniList's synopsis (in
 English for now), genres, non-spoiler tags, facts and, when AniList has one,
 the YouTube trailer. Details are fetched only when a title is opened and cached
@@ -160,8 +173,16 @@ workflow file is on `main`.
 ## Commands
 
 ```sh
-pnpm dev        # vite dev server
+pnpm dev        # vite dev server; also serves /api/* with a local D1 database
 pnpm lint       # oxlint
 pnpm build      # production build into dist/
-pnpm preview    # serve the build locally
+pnpm preview    # serve the build locally (static files only, no /api)
+pnpm db:migrate           # apply new migrations/ files to the production database
+pnpm db:migrate:preview   # ...and to the database PR previews share
 ```
+
+`pnpm dev` runs the Worker's handler inside Vite against a local database in
+`.wrangler/`, and applies migrations to it on start. The two remote databases
+are not migrated by deploys: after adding a file to `migrations/`, run the two
+`db:migrate` commands before the code that needs it goes live. PR previews use
+their own database (`previews` in `wrangler.jsonc`), never production's.
