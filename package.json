@@ -27,6 +27,6 @@
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
     "vite": "^8.2.0",
-    "wrangler": "^4.122.0"
+    "wrangler": "^4.168.0"
   }
 }
