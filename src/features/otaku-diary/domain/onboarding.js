@@ -3,7 +3,7 @@
 export const GUIDE_NAME = '코토리';
 
 export const initialOnboarding = {
-  step: 'greet', // greet → nameOk → search → dive → invite → done
+  step: 'greet', // greet → nameOk → search → dive → invite
   nickname: '',
   firstAnime: null,
 };
@@ -23,10 +23,6 @@ export function onboardingReducer(state, action) {
     case 'animePicked':
       if (state.step !== 'search') return state;
       return { ...state, step: 'dive', firstAnime: action.anime };
-    // The invitation is answered by going into the submarine, not by a tap
-    // on the text box.
-    case 'submarineEntered':
-      return state.step === 'invite' ? { ...state, step: 'done' } : state;
     case 'advanced': {
       const next = NEXT_ON_ADVANCE[state.step];
       return next ? { ...state, step: next } : state;

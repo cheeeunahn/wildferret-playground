@@ -19,6 +19,35 @@
   border-color: #ff8fb8;
 }
 
+/* "Tap here": the bar lights up and dims, over and over. */
+.bar[data-highlight] {
+  animation: glow 1.2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    border-color: #bfe3f5;
+    box-shadow:
+      0 6px 18px rgb(30 60 110 / 0.18),
+      0 0 0 0 rgb(255 111 163 / 0);
+  }
+  50% {
+    border-color: #ff6fa3;
+    box-shadow:
+      0 6px 18px rgb(30 60 110 / 0.18),
+      0 0 0 4px rgb(255 111 163 / 0.35),
+      0 0 22px 8px rgb(255 111 163 / 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar[data-highlight] {
+    border-color: #ff6fa3;
+    animation: none;
+  }
+}
+
 .icon {
   font-size: 15px;
 }

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDiary } from './hooks/useDiary';
 import { useMusic } from './hooks/useSound';
 import LibraryScreen from './screens/LibraryScreen';
@@ -9,6 +9,10 @@ import TitleScreen from './screens/TitleScreen';
 import './fonts.css';
 import styles from './OtakuDiaryPage.module.css';
 
+// Half of the trip into or out of the submarine: the screen fades to dark for this
+// long, changes, then fades back in. Matches the transition in the CSS.
+const FADE_MS = 400;
+
 // Wires the diary to the screens and decides which one shows.
 export default function OtakuDiaryPage() {
   const diary = useDiary();
@@ -18,18 +22,38 @@ export default function OtakuDiaryPage() {
   // Background music plays on every screen but the title.
   useMusic(screen !== 'title');
 
+  // Fades the screen out, runs `change` while it is dark, and fades back in.
+  // Taps during the fade are ignored.
+  const [fading, setFading] = useState(false);
+  const fadeTimer = useRef(null);
+  useEffect(() => () => clearTimeout(fadeTimer.current), []);
+  const fadeTo = useCallback((change) => {
+    if (fadeTimer.current) return;
+    setFading(true);
+    fadeTimer.current = setTimeout(() => {
+      fadeTimer.current = null;
+      change();
+      setFading(false);
+    }, FADE_MS);
+  }, []);
+
   // Onboarding ends with the user stepping into the submarine.
   const finishOnboarding = useCallback(() => {
-    saveProfile({ onboarded: true, visitedRoom: true });
-    setFirstRoomVisit(true);
-    setScreen('room');
-  }, [saveProfile]);
+    fadeTo(() => {
+      saveProfile({ onboarded: true, visitedRoom: true });
+      setFirstRoomVisit(true);
+      setScreen('room');
+    });
+  }, [fadeTo, saveProfile]);
 
   const enterSubmarine = () => {
     // The guide shows the room around on the first visit only.
-    setFirstRoomVisit(!diary.profile.visitedRoom);
-    saveProfile({ visitedRoom: true });
-    setScreen('room');
+    const firstVisit = !diary.profile.visitedRoom;
+    fadeTo(() => {
+      setFirstRoomVisit(firstVisit);
+      saveProfile({ visitedRoom: true });
+      setScreen('room');
+    });
   };
 
   const startOver = () => {
@@ -58,7 +82,7 @@ export default function OtakuDiaryPage() {
             showTour={firstRoomVisit}
             onTourEnd={() => setFirstRoomVisit(false)}
             onOpenBookshelf={() => setScreen('library')}
-            onBack={() => setScreen('main')}
+            onBack={() => fadeTo(() => setScreen('main'))}
           />
         )}
         {screen === 'library' && (
@@ -70,6 +94,7 @@ export default function OtakuDiaryPage() {
             }}
           />
         )}
+        <div className={styles.fade} data-on={fading || undefined} aria-hidden="true" />
       </main>
     </div>
   );

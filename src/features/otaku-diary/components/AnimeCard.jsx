@@ -1,3 +1,4 @@
+import Stars from './Stars';
 import styles from './AnimeCard.module.css';
 
 const FORMAT_LABEL = {
@@ -10,9 +11,10 @@ const FORMAT_LABEL = {
   MUSIC: '뮤직',
 };
 
-// One anime as a row: poster, title, year and format. `action` is whatever
-// the caller wants at the right edge.
-export default function AnimeCard({ anime, action }) {
+// One anime as a row: poster, title, year and format, plus the user's stars
+// and comment when it has been rated. `action` is whatever the caller wants
+// at the right edge.
+export default function AnimeCard({ anime, action, showReview = true }) {
   const meta = [anime.year, FORMAT_LABEL[anime.format] ?? anime.format]
     .filter(Boolean)
     .join(' · ');
@@ -23,6 +25,8 @@ export default function AnimeCard({ anime, action }) {
       <div className={styles.body}>
         <span className={styles.title}>{anime.title}</span>
         <span className={styles.meta}>{meta}</span>
+        {showReview && anime.rating > 0 && <Stars rating={anime.rating} className={styles.stars} />}
+        {showReview && anime.comment && <span className={styles.comment}>{anime.comment}</span>}
       </div>
       {action}
     </div>

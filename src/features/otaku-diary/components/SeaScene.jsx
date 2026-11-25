@@ -42,7 +42,7 @@ function rulerMarks(count) {
 // Sky, sea and submarine. `depth` comes from domain/depth. When `cargo`
 // changes, that anime drops into the submarine before it sinks. With
 // `onSubmarineClick` the submarine becomes a button; `nudge` is a bubble
-// shown over it.
+// shown over it, and the hull glows on and off for as long as it shows.
 //
 // Each new title is shown three ways: the hull dips and lets out bubbles,
 // the depth ruler slides up by one mark, and (near the top) the surface
@@ -53,6 +53,10 @@ export default function SeaScene({ depth, cargo, onSubmarineClick, nudge, childr
   const [openedAt] = useState(count);
   const sink = sinkFor(count);
   const camera = Math.max(sink - CRUISE, 0);
+  // Where the hull is on screen while the cargo drops: where it sat before
+  // this title sank it. Once the camera follows, that is always CRUISE.
+  const countBeforeCargo = Math.max(count - (cargo?.countsForDepth ? 1 : 0), 0);
+  const cargoTarget = Math.min(sinkFor(countBeforeCargo), CRUISE);
 
   const hull = (
     <span key={count} className={styles.hull} data-dive={count !== openedAt || undefined}>
@@ -99,6 +103,7 @@ export default function SeaScene({ depth, cargo, onSubmarineClick, nudge, childr
           type="button"
           onClick={onSubmarineClick}
           aria-label="잠수함 안으로 들어가기"
+          data-glow={Boolean(nudge) || undefined}
         >
           {nudge && <SpeechBubble className={styles.nudge}>{nudge}</SpeechBubble>}
           {hull}
@@ -112,7 +117,11 @@ export default function SeaScene({ depth, cargo, onSubmarineClick, nudge, childr
       <Waves />
 
       {cargo && (
-        <div key={cargo.id} className={styles.cargo}>
+        <div
+          key={cargo.id}
+          className={styles.cargo}
+          style={{ '--cargo-target': `${cargoTarget}px` }}
+        >
           <Poster anime={cargo} className={styles.cargoPoster} />
         </div>
       )}

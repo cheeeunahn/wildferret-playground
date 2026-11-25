@@ -75,7 +75,7 @@
 
 .tag {
   position: absolute;
-  top: -14px;
+  top: -26px;
   left: 50%;
   padding: 5px 14px;
   border-radius: 999px;
@@ -86,6 +86,32 @@
   white-space: nowrap;
   translate: -50% 0;
   box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
+  /* `transform` for the bounce, because `translate` centres the tag. */
+  animation: point 1s ease-in-out infinite;
+}
+
+/* The tail that makes the tag a pointer aimed at the shelf. */
+.tag::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  border: 7px solid transparent;
+  border-top: 9px solid #ff7fad;
+  border-bottom: 0;
+  translate: -50% 0;
+}
+
+@keyframes point {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag {
+    animation: none;
+  }
 }
 
 .shelfFallback {

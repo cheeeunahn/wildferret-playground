@@ -1,6 +1,5 @@
 import { useTypewriter } from '../hooks/useTypewriter';
 import { useSpokenLine } from '../hooks/useSound';
-import SoundToggle from './SoundToggle';
 import styles from './DialogueBox.module.css';
 
 // Visual-novel text box. A tap finishes the line; a second tap calls
@@ -26,7 +25,6 @@ export default function DialogueBox({ speaker, text, voice, onAdvance, children 
         aria-label={text}
       >
         <span className={styles.speaker}>{speaker}</span>
-        <SoundToggle className={styles.sound} />
         {/* The full line holds the box's height; the typed part sits on top. */}
         <p className={styles.text} aria-hidden="true">
           <span className={styles.ghost}>{text}</span>

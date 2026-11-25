@@ -37,12 +37,6 @@
   box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
 }
 
-.sound {
-  position: absolute;
-  top: -17px;
-  right: 14px;
-}
-
 .text {
   position: relative;
   margin: 0;

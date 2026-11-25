@@ -4,7 +4,9 @@ import AnimeSearch from '../components/AnimeSearch';
 import Character from '../components/Character';
 import DialogueBox from '../components/DialogueBox';
 import NicknameInput from '../components/NicknameInput';
+import ReviewSheet from '../components/ReviewSheet';
 import SeaScene from '../components/SeaScene';
+import SoundToggle from '../components/SoundToggle';
 import { depthFor } from '../domain/depth';
 import { GUIDE_NAME, lineFor } from '../domain/onboarding';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -22,21 +24,19 @@ export default function OnboardingScreen({ diary, onFinish }) {
   // Steps the user answers by doing something, not by tapping the text box.
   const waitsForAction = step === 'greet' || step === 'search' || step === 'invite';
 
-  useEffect(() => {
-    if (step === 'done') onFinish();
-  }, [step, onFinish]);
-
   const submitName = (nickname) => {
     diary.saveProfile({ nickname: nickname.trim() });
     actions.submitName(nickname);
   };
 
-  const pickAnime = (anime) => {
-    diary.addAnime(anime);
-    actions.pickAnime(anime);
-  };
+  // The anime picked from search, waiting for its stars.
+  const [picked, setPicked] = useState(null);
 
-  if (step === 'done') return null;
+  const recordPicked = async (review) => {
+    await diary.addAnime(picked, review);
+    actions.pickAnime(picked);
+    setPicked(null);
+  };
 
   const background = assetUrl('bg-deck.jpg');
 
@@ -49,9 +49,11 @@ export default function OnboardingScreen({ diary, onFinish }) {
         <FirstDive
           anime={state.firstAnime}
           depth={diary.depth}
-          onSubmarineClick={step === 'invite' ? actions.enterSubmarine : undefined}
+          onSubmarineClick={step === 'invite' ? onFinish : undefined}
         />
       )}
+
+      <SoundToggle className={styles.sound} />
 
       <Character
         expression={line.expression}
@@ -60,7 +62,7 @@ export default function OnboardingScreen({ diary, onFinish }) {
 
       {step === 'search' && (
         <div className={styles.searchSlot}>
-          <AnimeSearch onPick={pickAnime} autoFocus />
+          <AnimeSearch onPick={setPicked} autoFocus highlight />
         </div>
       )}
 
@@ -73,6 +75,10 @@ export default function OnboardingScreen({ diary, onFinish }) {
       >
         {step === 'greet' && <NicknameInput onSubmit={submitName} />}
       </DialogueBox>
+
+      {picked && (
+        <ReviewSheet anime={picked} onSubmit={recordPicked} onCancel={() => setPicked(null)} />
+      )}
     </div>
   );
 }

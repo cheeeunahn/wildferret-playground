@@ -43,3 +43,16 @@
   color: #7a85a3;
   font-size: 12px;
 }
+
+.stars {
+  margin-top: 2px;
+}
+
+.comment {
+  margin-top: 2px;
+  color: #4a5473;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

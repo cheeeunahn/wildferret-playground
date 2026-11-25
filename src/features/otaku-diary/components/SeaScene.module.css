@@ -144,6 +144,33 @@ button.sub:active img {
   scale: 0.97;
 }
 
+/* "Tap here": a glow around the hull's outline lights up and dims. The first
+   shadow is the submarine's usual one. */
+.sub[data-glow] img,
+.sub[data-glow] svg {
+  animation: hullGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes hullGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 8px 12px rgb(10 40 80 / 0.25)) drop-shadow(0 0 0 rgb(255 111 163 / 0));
+  }
+  50% {
+    filter: drop-shadow(0 8px 12px rgb(10 40 80 / 0.25))
+      drop-shadow(0 0 14px rgb(255 111 163 / 0.95));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sub[data-glow] img,
+  .sub[data-glow] svg {
+    filter: drop-shadow(0 8px 12px rgb(10 40 80 / 0.25))
+      drop-shadow(0 0 10px rgb(255 111 163 / 0.8));
+    animation: none;
+  }
+}
+
 /* Centred over the hull. `transform` here, because the bubble's own float
    animation uses `translate`. */
 .sub .nudge {
@@ -205,7 +232,7 @@ button.sub:active img {
 
 .readout {
   position: absolute;
-  top: 10px;
+  top: var(--readout-top, 10px);
   right: 12px;
   z-index: 5;
   display: flex;
@@ -259,7 +286,7 @@ button.sub:active img {
     opacity: 1;
   }
   100% {
-    top: calc(var(--waterline) - 30px);
+    top: calc(var(--surface) + var(--cargo-target) - 30px);
     opacity: 0;
     transform: translate(-50%, 0) rotate(0) scale(0.25);
   }

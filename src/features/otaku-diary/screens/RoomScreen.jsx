@@ -96,7 +96,8 @@ export default function RoomScreen({ diary, showTour, onTourEnd, onOpenBookshelf
         ) : (
           <span className={styles.shelfFallback} />
         )}
-        <span className={styles.tag}>책장 · {count}편</span>
+        {/* The pointer waits until her first-visit tour is over. */}
+        {!tourLine && <span className={styles.tag}>책장 · {count}편</span>}
       </button>
 
       {tourLine ? (

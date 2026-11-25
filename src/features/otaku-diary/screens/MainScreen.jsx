@@ -1,19 +1,25 @@
 import { useMemo, useState } from 'react';
 import AnimeSearch from '../components/AnimeSearch';
+import ReviewSheet from '../components/ReviewSheet';
 import SeaScene from '../components/SeaScene';
 import SoundToggle from '../components/SoundToggle';
 import styles from './MainScreen.module.css';
 
-// Where the user lands after onboarding: search, add, watch the submarine.
+// Where the user lands after onboarding: search, rate, add, watch the
+// submarine.
 // Tapping the submarine goes inside it.
 export default function MainScreen({ diary, onEnterSubmarine, onReset }) {
   const { profile, records, depth } = diary;
   const [lastAdded, setLastAdded] = useState(null);
   const recordedIds = useMemo(() => new Set(records.map((r) => r.id)), [records]);
 
-  const add = (anime) => {
-    setLastAdded(anime);
-    diary.addAnime(anime);
+  // The anime picked from search, waiting for its stars.
+  const [picked, setPicked] = useState(null);
+
+  const add = async (review) => {
+    await diary.addAnime(picked, review);
+    setLastAdded(picked);
+    setPicked(null);
   };
 
   return (
@@ -21,11 +27,11 @@ export default function MainScreen({ diary, onEnterSubmarine, onReset }) {
       <header className={styles.header}>
         <div className={styles.titleRow}>
           <h1 className={styles.heading}>
-            <span>{profile.nickname || '덕후'}</span> 님의 다이어리
+            <span>{profile.nickname || '덕후'}</span>님의 애니 기록
           </h1>
           <SoundToggle />
         </div>
-        <AnimeSearch onPick={add} recordedIds={recordedIds} />
+        <AnimeSearch onPick={setPicked} recordedIds={recordedIds} />
       </header>
 
       <div className={styles.sea}>
@@ -49,6 +55,10 @@ export default function MainScreen({ diary, onEnterSubmarine, onReset }) {
           처음부터 다시
         </button>
       </footer>
+
+      {picked && (
+        <ReviewSheet anime={picked} onSubmit={add} onCancel={() => setPicked(null)} />
+      )}
     </div>
   );
 }

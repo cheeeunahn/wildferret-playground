@@ -20,7 +20,11 @@ export function useDiary() {
     [],
   );
   const addAnime = useCallback(
-    async (anime) => setDiary(await diaryRepository.addRecord(anime)),
+    async (anime, review) => setDiary(await diaryRepository.addRecord(anime, review)),
+    [],
+  );
+  const saveReview = useCallback(
+    async (animeId, review) => setDiary(await diaryRepository.saveReview(animeId, review)),
     [],
   );
   const reset = useCallback(
@@ -38,6 +42,7 @@ export function useDiary() {
     depth,
     saveProfile,
     addAnime,
+    saveReview,
     reset,
   };
 }

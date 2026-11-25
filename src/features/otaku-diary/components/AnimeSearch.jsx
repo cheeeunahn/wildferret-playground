@@ -4,8 +4,9 @@ import AnimeCard from './AnimeCard';
 import styles from './AnimeSearch.module.css';
 
 // Search bar with a results panel under it. `recordedIds` marks titles the
-// user already has; `onPick` receives the chosen anime.
-export default function AnimeSearch({ onPick, recordedIds, autoFocus = false }) {
+// user already has; `onPick` receives the chosen anime. `highlight` makes the
+// bar glow on and off until the user starts typing.
+export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, highlight = false }) {
   const [query, setQuery] = useState('');
   const { status, results, error } = useAnimeSearch(query);
 
@@ -16,7 +17,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false }) 
 
   return (
     <div className={styles.search}>
-      <label className={styles.bar}>
+      <label className={styles.bar} data-highlight={(highlight && !query) || undefined}>
         <span className={styles.icon} aria-hidden="true">🔍</span>
         <input
           className={styles.input}
