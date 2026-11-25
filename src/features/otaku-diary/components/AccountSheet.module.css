@@ -93,6 +93,42 @@
   line-height: 1.5;
 }
 
+.note a {
+  color: #ff5a96;
+  font-weight: 700;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2b3350;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #ff6fa3;
+}
+
+.heading {
+  margin: 0;
+  color: #2b3350;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+/* The button that cannot be undone. */
+.danger {
+  flex: 1;
+  background: #d6336c;
+  color: #fff;
+}
+
 .error {
   margin: 0;
   color: #d6336c;
@@ -106,7 +142,8 @@
 }
 
 .cancel,
-.submit {
+.submit,
+.danger {
   height: 50px;
   border: 0;
   border-radius: 14px;
@@ -128,7 +165,8 @@
 }
 
 .cancel:disabled,
-.submit:disabled {
+.submit:disabled,
+.danger:disabled {
   opacity: 0.45;
   cursor: default;
 }

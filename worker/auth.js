@@ -1,8 +1,9 @@
 // /api/auth: accounts with an ID and a password.
 //
-//   POST /api/auth/signup  { loginId, password }  make an account
+//   POST /api/auth/signup  { loginId, password, ageConfirmed }  make an account
 //   POST /api/auth/login   { loginId, password }
 //   POST /api/auth/logout
+//   POST /api/auth/delete  { password }  delete the account and its diary
 //
 // Each answers `{ ok: true }` and sets or clears the session cookie; the page
 // then reads /api/diary as usual.
@@ -46,10 +47,46 @@ function accountOf(db, userId) {
   return db.prepare('SELECT login_id FROM credentials WHERE user_id = ?').bind(userId).first();
 }
 
+// Throws unless `password` is the account's. Wrong guesses are counted, and
+// too many in a row lock the ID for a while, whoever is asking.
+async function assertPassword(db, account, password) {
+  const now = Date.now();
+  if (account.locked_until && Date.parse(account.locked_until) > now) {
+    throw new HttpError(429, '비밀번호를 여러 번 틀렸어요. 5분 뒤에 다시 시도해 주세요.');
+  }
+  const correct = await verifyPassword(password, {
+    hash: account.password_hash,
+    salt: account.salt,
+    iterations: account.iterations,
+  });
+  if (correct) return;
+  const failed = account.failed_attempts + 1;
+  const lock = failed >= MAX_FAILED_ATTEMPTS;
+  await db
+    .prepare('UPDATE credentials SET failed_attempts = ?, locked_until = ? WHERE login_id = ?')
+    .bind(lock ? 0 : failed, lock ? new Date(now + LOCK_MS).toISOString() : null, account.login_id)
+    .run();
+  throw new HttpError(401, WRONG);
+}
+
 // A new token on every signup and login, so one captured before is useless
 // after. Runs `statements` and the session change as one batch.
 async function startSession(db, url, session, userId, statements) {
   if (session) statements.push(db.prepare('DELETE FROM sessions WHERE token_hash = ?').bind(session.tokenHash));
+  // Sessions past their date are no use to anyone; logins sweep them out, so
+  // none is kept longer than the privacy policy says.
+  statements.push(
+    db.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(new Date().toISOString()),
+    // A visitor without an account is only reachable through their session.
+    // Once that has expired nobody can open their diary again, so it goes.
+    db.prepare(
+      `DELETE FROM users
+        WHERE id NOT IN (SELECT user_id FROM credentials)
+          AND id NOT IN (SELECT user_id FROM identities)
+          AND id NOT IN (SELECT user_id FROM sessions)
+          AND id != ?`,
+    ).bind(userId),
+  );
   const created = await newSession(url, db, userId);
   statements.push(created.statement);
   await db.batch(statements);
@@ -60,7 +97,11 @@ async function startSession(db, url, session, userId, statements) {
 // diary yet, an empty one is created.
 async function signup(request, env, url) {
   const db = env.DB;
-  const { loginId, password } = parseCredentials(await readJson(request), { checkRules: true });
+  const body = await readJson(request);
+  const { loginId, password } = parseCredentials(body, { checkRules: true });
+  // Children under 14 would need a guardian's consent, which there is no way
+  // to collect here, so the service is for 14 and over.
+  if (body.ageConfirmed !== true) throw new HttpError(400, '만 14세 이상만 가입할 수 있어요.');
   const session = await readSession(request, url, db);
   if (session && (await accountOf(db, session.userId))) throw new HttpError(409, '이미 로그인되어 있어요.');
   if (await db.prepare('SELECT 1 FROM credentials WHERE login_id = ?').bind(loginId).first()) {
@@ -105,25 +146,7 @@ async function login(request, env, url) {
     await wastePasswordCheck(password);
     throw new HttpError(401, WRONG);
   }
-  const now = Date.now();
-  if (account.locked_until && Date.parse(account.locked_until) > now) {
-    throw new HttpError(429, '비밀번호를 여러 번 틀렸어요. 5분 뒤에 다시 시도해 주세요.');
-  }
-
-  const correct = await verifyPassword(password, {
-    hash: account.password_hash,
-    salt: account.salt,
-    iterations: account.iterations,
-  });
-  if (!correct) {
-    const failed = account.failed_attempts + 1;
-    const lock = failed >= MAX_FAILED_ATTEMPTS;
-    await db
-      .prepare('UPDATE credentials SET failed_attempts = ?, locked_until = ? WHERE login_id = ?')
-      .bind(lock ? 0 : failed, lock ? new Date(now + LOCK_MS).toISOString() : null, loginId)
-      .run();
-    throw new HttpError(401, WRONG);
-  }
+  await assertPassword(db, account, password);
 
   const userId = account.user_id;
   const session = await readSession(request, url, db);
@@ -163,9 +186,30 @@ async function logout(request, env, url) {
   return json({ ok: true }, { cookie: clearedCookie(url) });
 }
 
+// Removes the account for good: the user row goes, and the database takes
+// the login, every session on every device, and all records with it. The
+// password is asked again so a phone left unlocked is not enough.
+async function deleteAccount(request, env, url) {
+  const db = env.DB;
+  const body = await readJson(request);
+  const session = await readSession(request, url, db);
+  const account =
+    session && (await db.prepare('SELECT * FROM credentials WHERE user_id = ?').bind(session.userId).first());
+  if (!account) throw new HttpError(401, '로그인한 뒤에 삭제할 수 있어요.');
+  const password = typeof body.password === 'string' ? body.password.slice(0, MAX_PASSWORD_LENGTH + 1) : '';
+  try {
+    await assertPassword(db, account, password);
+  } catch (error) {
+    if (error.status === 401) throw new HttpError(401, '비밀번호가 맞지 않아요.');
+    throw error;
+  }
+  await db.prepare('DELETE FROM users WHERE id = ?').bind(session.userId).run();
+  return json({ ok: true }, { cookie: clearedCookie(url) });
+}
+
 export async function handleAuth(request, env, url) {
   const path = url.pathname.slice('/api/auth'.length);
-  const handler = { '/signup': signup, '/login': login, '/logout': logout }[path];
+  const handler = { '/signup': signup, '/login': login, '/logout': logout, '/delete': deleteAccount }[path];
   if (!handler || request.method !== 'POST') throw new HttpError(404, '없는 주소예요.');
   assertSameOrigin(request, url);
   return handler(request, env, url);

@@ -84,6 +84,64 @@
   color: #fff;
 }
 
+/* The dropdown filters share the row style of the star chips. The arrow is
+   drawn here because the native one is hidden with the native look. */
+.select {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 24px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238a7c70' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 10px center / 9px;
+  color: #8a7c70;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 4px rgb(60 40 30 / 0.1);
+  appearance: none;
+  cursor: pointer;
+}
+
+.select[data-on] {
+  background-color: #ffe7f0;
+  color: #d6336c;
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* "12편 중 3편", above the first row while a filter is on. */
+.list .summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: #8a7c70;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.clear {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: #ff5a96;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .list {
   display: flex;
   flex-direction: column;

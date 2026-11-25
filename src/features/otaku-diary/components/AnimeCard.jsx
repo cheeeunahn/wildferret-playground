@@ -1,21 +1,12 @@
+import { formatLabel } from '../domain/format';
 import Stars from './Stars';
 import styles from './AnimeCard.module.css';
-
-const FORMAT_LABEL = {
-  TV: 'TV',
-  TV_SHORT: 'TV 단편',
-  MOVIE: '극장판',
-  OVA: 'OVA',
-  ONA: 'ONA',
-  SPECIAL: '스페셜',
-  MUSIC: '뮤직',
-};
 
 // One anime as a row: poster, title, year and format, plus the user's stars
 // and comment when it has been rated. `action` is whatever the caller wants
 // at the right edge. With `onOpen`, the poster and text become one button.
 export default function AnimeCard({ anime, action, onOpen, showReview = true }) {
-  const meta = [anime.year, FORMAT_LABEL[anime.format] ?? anime.format]
+  const meta = [anime.year, formatLabel(anime.format)]
     .filter(Boolean)
     .join(' · ');
 

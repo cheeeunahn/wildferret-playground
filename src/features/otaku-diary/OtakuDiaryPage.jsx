@@ -20,7 +20,7 @@ export default function OtakuDiaryPage() {
   const backdropRef = useLockedHeight();
   const [screen, setScreen] = useState('title'); // title | onboarding | main | room | library
   const [firstRoomVisit, setFirstRoomVisit] = useState(false);
-  const { saveProfile, reset } = diary;
+  const { saveProfile } = diary;
   // Background music plays on every screen but the title.
   useMusic(screen !== 'title');
 
@@ -58,11 +58,6 @@ export default function OtakuDiaryPage() {
     });
   };
 
-  const startOver = () => {
-    reset();
-    setScreen('title');
-  };
-
   return (
     <div ref={backdropRef} className={styles.backdrop}>
       <main className={styles.phone}>
@@ -79,7 +74,7 @@ export default function OtakuDiaryPage() {
           <OnboardingScreen diary={diary} onFinish={finishOnboarding} />
         )}
         {screen === 'main' && (
-          <MainScreen diary={diary} onEnterSubmarine={enterSubmarine} onReset={startOver} />
+          <MainScreen diary={diary} onEnterSubmarine={enterSubmarine} />
         )}
         {screen === 'room' && (
           <RoomScreen

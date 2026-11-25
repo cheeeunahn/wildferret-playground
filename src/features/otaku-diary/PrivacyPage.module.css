@@ -1,0 +1,71 @@
+/* Same phone-sized column as the diary, but a plain page that scrolls. */
+.backdrop {
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  background: radial-gradient(circle at 50% 0, #1d5a9e, #0b1f55 70%);
+}
+
+.page {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
+  background: #fbf6f0;
+  color: #4a5473;
+  font-family:
+    NanumSquareRound, -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.back {
+  color: #ff5a96;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.title {
+  margin: 16px 0 6px;
+  color: #2b3350;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.lead {
+  margin: 0 0 8px;
+}
+
+.section h2 {
+  margin: 22px 0 6px;
+  color: #2b3350;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.section p {
+  margin: 0 0 6px;
+}
+
+.section ul {
+  margin: 0 0 6px;
+  padding-left: 18px;
+}
+
+.section li {
+  margin-bottom: 4px;
+}
+
+.section a {
+  color: #ff5a96;
+}
+
+.date {
+  margin: 26px 0 0;
+  color: #9a8f86;
+  font-size: 12px;
+}

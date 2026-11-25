@@ -13,6 +13,7 @@ deployed to Cloudflare Workers: static assets, plus a small Worker behind
 | `/tools/` | the tools tab: pick a tool, use it inside the page |
 | `/tools/<tool-id>/` | one tool on its own page, without the site chrome |
 | `/otaku-diary` | 애니와 함께하는 바다모험, a phone-sized anime diary (unlisted; reachable by URL only) |
+| `/otaku-diary/privacy` | the diary's privacy policy (개인정보 처리방침) |
 
 Routing is client-side (`react-router-dom`), so `wrangler.jsonc` sets
 `not_found_handling: "single-page-application"` to serve `index.html` for
@@ -119,8 +120,10 @@ Cloudflare D1 database, behind `/api/diary` (routes are listed at the top of
 cookie, set on their first write, and the database keeps only the token's
 hash. Without an account, a diary belongs to that one browser.
 
-**Accounts.** The title screen offers 로그인 · 회원가입 with an ID and a
-password (`worker/auth.js`). Signing up turns the diary already in the browser
+**Accounts.** The title screen leads with 로그인, then 비회원으로 시작하기
+for using the diary without an account, and a 회원가입 link. Accounts are an ID
+and a password (`worker/auth.js`); logging in or signing up goes straight into
+the diary. Signing up turns the diary already in the browser
 into the account's diary. Logging in on another device opens that diary, and an
 anonymous diary already made on that device is merged into it. Logging out
 leaves the browser with a blank diary; the account's stays on the server.
@@ -131,8 +134,24 @@ leaves the browser with a blank diary; the account's stays on the server.
 - There is no email, so there is no password recovery: a forgotten password
   can only be reset by hand in the database. The sign-up form says so.
 - The empty `identities` table is kept for an external login provider later.
+- Signing up needs the "만 14세 이상입니다" box ticked; the server checks it too.
+- 계정 삭제 on the title screen asks for the password, then deletes the
+  account, its records and every session.
+- A visitor without an account is forgotten once their session has expired
+  (a year after their last visit): their records go with it.
+
+**Privacy policy.** `/otaku-diary/privacy` is linked from the title screen and
+the sign-up form. Its text is `domain/privacy.js` and describes what the code
+does: change it in the same commit as any change to what is stored, where, or
+which outside services the page contacts. The contact address shown on the
+page is `CONTACT_EMAIL` in the same file.
 A diary recorded in `localStorage` before the backend existed is sent to the
 server once, on the next visit, and merged.
+
+The bookshelf can be narrowed by star rating, genre, studio and format, all at
+once. Genre and studio are not stored with a record: they are fetched from
+AniList for the whole bookshelf, 50 titles per request, and cached in the
+browser for a week.
 
 Tapping a title on the bookshelf opens its details: AniList's synopsis (in
 English for now), genres, non-spoiler tags, facts and, when AniList has one,

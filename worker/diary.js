@@ -8,7 +8,6 @@
 //   POST   /api/diary/records                 { anime, review }
 //   PUT    /api/diary/records/:animeId/review { rating, comment }
 //   POST   /api/diary/import                  { profile, records } from localStorage
-//   DELETE /api/diary                         start over
 //
 // A visitor gets a user row and a session cookie on their first write, not
 // on a read, so crawlers and passers-by leave nothing behind.
@@ -202,16 +201,8 @@ async function importDiary(db, userId, body) {
   }
 }
 
-async function resetDiary(db, userId) {
-  await db.batch([
-    db.prepare('DELETE FROM records WHERE user_id = ?').bind(userId),
-    db.prepare("UPDATE users SET nickname = '', onboarded = 0, visited_room = 0 WHERE id = ?").bind(userId),
-  ]);
-}
-
 function route(method, path) {
   if (path === '' && method === 'GET') return { name: 'read' };
-  if (path === '' && method === 'DELETE') return { name: 'reset' };
   if (path === '/profile' && method === 'PATCH') return { name: 'profile' };
   if (path === '/records' && method === 'POST') return { name: 'add' };
   if (path === '/import' && method === 'POST') return { name: 'import' };
@@ -235,11 +226,6 @@ export async function handleDiary(request, env, url) {
   if (matched.name === 'read') return respond();
 
   assertSameOrigin(request, url);
-  if (matched.name === 'reset') {
-    if (userId) await resetDiary(db, userId);
-    return respond();
-  }
-
   // Parse before creating anyone, so a malformed request leaves no user row.
   const body = await readJson(request);
   if (!userId) {

@@ -57,13 +57,3 @@
   color: rgb(255 255 255 / 0.7);
   font-size: 11px;
 }
-
-.footer button {
-  padding: 6px 4px;
-  border: 0;
-  background: none;
-  color: inherit;
-  font-size: 11px;
-  text-decoration: underline;
-  cursor: pointer;
-}

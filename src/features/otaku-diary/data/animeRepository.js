@@ -151,6 +151,37 @@ async function searchLive(key, signal) {
   return results;
 }
 
+// Genre and studio for many titles at once, for the bookshelf's filters:
+// one request covers up to 50 ids. Kept in storage for a week, under one key.
+const FACETS_QUERY = `
+query ($ids: [Int]) {
+  Page(perPage: 50) {
+    media(id_in: $ids, type: ANIME) {
+      id
+      genres
+      studios(isMain: true) { nodes { name } }
+    }
+  }
+}`;
+const FACETS_KEY = 'otaku-diary:facets:v1';
+const FACETS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const FACETS_PER_REQUEST = 50;
+
+let facetsCache = null;
+function loadFacetsCache() {
+  if (facetsCache) return facetsCache;
+  facetsCache = {};
+  try {
+    const stored = JSON.parse(localStorage.getItem(FACETS_KEY)) ?? {};
+    for (const [id, entry] of Object.entries(stored)) {
+      if (Date.now() - entry.at < FACETS_MAX_AGE_MS) facetsCache[id] = entry;
+    }
+  } catch {
+    // Unreadable cache: fetch again.
+  }
+  return facetsCache;
+}
+
 // Details are fetched only when a title is opened, then kept in memory for
 // the visit and in storage for a week: AniList allows few requests a minute.
 const detailsCache = new Map();
@@ -207,6 +238,35 @@ export const animeRepository = {
       0,
       MAX_RESULTS,
     );
+  },
+
+  // `{ [id]: { genres, studio } }` for the given anime ids. Ids AniList does
+  // not return are remembered as having neither, so they are not asked for
+  // again on every visit.
+  async getFacets(ids, { signal } = {}) {
+    const cache = loadFacetsCache();
+    const missing = ids.filter((id) => !cache[id]);
+    for (let i = 0; i < missing.length; i += FACETS_PER_REQUEST) {
+      const chunk = missing.slice(i, i + FACETS_PER_REQUEST);
+      const data = await request(FACETS_QUERY, { ids: chunk }, signal);
+      const found = new Map((data?.Page?.media ?? []).map((media) => [media.id, media]));
+      for (const id of chunk) {
+        const media = found.get(id);
+        cache[id] = {
+          at: Date.now(),
+          genres: media?.genres ?? [],
+          studio: media?.studios?.nodes?.[0]?.name ?? null,
+        };
+      }
+    }
+    if (missing.length > 0) {
+      try {
+        localStorage.setItem(FACETS_KEY, JSON.stringify(cache));
+      } catch {
+        // No storage: it stays in memory for this visit.
+      }
+    }
+    return Object.fromEntries(ids.map((id) => [id, cache[id]]));
   },
 
   // Synopsis, genres, trailer and the rest for one anime id.

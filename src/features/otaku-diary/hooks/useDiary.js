@@ -50,18 +50,10 @@ export function useDiary() {
     async (animeId, review) => setDiary(await diaryRepository.saveReview(animeId, review)),
     [],
   );
-  const reset = useCallback(async () => {
-    setDiary((d) => ({ ...d, profile: BLANK_PROFILE, records: [] }));
-    try {
-      setDiary(await diaryRepository.reset());
-    } catch (failure) {
-      console.warn('diary not reset:', failure.message);
-    }
-  }, []);
-
   // These reject with a message for the user when the server says no.
   const signup = useCallback(
-    async (loginId, password) => setDiary(await diaryRepository.signup(loginId, password)),
+    async (loginId, password, ageConfirmed) =>
+      setDiary(await diaryRepository.signup(loginId, password, ageConfirmed)),
     [],
   );
   const login = useCallback(
@@ -69,6 +61,10 @@ export function useDiary() {
     [],
   );
   const logout = useCallback(async () => setDiary(await diaryRepository.logout()), []);
+  const deleteAccount = useCallback(
+    async (password) => setDiary(await diaryRepository.deleteAccount(password)),
+    [],
+  );
 
   const records = diary?.records;
   const depth = useMemo(() => depthOfRecords(records ?? []), [records]);
@@ -84,9 +80,9 @@ export function useDiary() {
     signup,
     login,
     logout,
+    deleteAccount,
     saveProfile,
     addAnime,
     saveReview,
-    reset,
   };
 }

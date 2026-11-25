@@ -8,7 +8,7 @@ import styles from './MainScreen.module.css';
 // Where the user lands after onboarding: search, rate, add, watch the
 // submarine.
 // Tapping the submarine goes inside it.
-export default function MainScreen({ diary, onEnterSubmarine, onReset }) {
+export default function MainScreen({ diary, onEnterSubmarine }) {
   const { profile, records, depth } = diary;
   const [lastAdded, setLastAdded] = useState(null);
   const recordedIds = useMemo(() => new Set(records.map((r) => r.id)), [records]);
@@ -51,9 +51,6 @@ export default function MainScreen({ diary, onEnterSubmarine, onReset }) {
 
       <footer className={styles.footer}>
         <span>작품 정보·이미지: AniList</span>
-        <button type="button" onClick={onReset}>
-          처음부터 다시
-        </button>
       </footer>
 
       {picked && (

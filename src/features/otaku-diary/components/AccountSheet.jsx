@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
+import { PRIVACY_PATH } from '../domain/privacy';
 import styles from './AccountSheet.module.css';
 
 const MIN_PASSWORD_LENGTH = 8;
 
 // Bottom sheet for logging in or making an account, with an ID and a
 // password. The server has the final say on both and its message is shown
-// as it comes; the checks here only save a round trip.
-export default function AccountSheet({ diary, onClose }) {
-  const [mode, setMode] = useState('login'); // login | signup
+// as it comes; the checks here only save a round trip. `initialMode` picks
+// the tab it opens on; `onSuccess` runs once the visitor is logged in.
+export default function AccountSheet({ diary, initialMode = 'login', onSuccess, onClose }) {
+  const [mode, setMode] = useState(initialMode); // login | signup
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const idRef = useRef(null);
@@ -24,7 +27,7 @@ export default function AccountSheet({ diary, onClose }) {
 
   const signingUp = mode === 'signup';
   const hasDiary = diary.records.length > 0;
-  const ready = loginId.trim() && password && (!signingUp || confirm);
+  const ready = loginId.trim() && password && (!signingUp || (confirm && ageConfirmed));
 
   const switchTo = (next) => {
     setMode(next);
@@ -46,8 +49,9 @@ export default function AccountSheet({ diary, onClose }) {
     setBusy(true);
     setError(null);
     try {
-      await (signingUp ? diary.signup(loginId, password) : diary.login(loginId, password));
+      await (signingUp ? diary.signup(loginId, password, ageConfirmed) : diary.login(loginId, password));
       onClose();
+      onSuccess?.();
     } catch (err) {
       setError(err?.message || '잠시 후 다시 시도해 주세요.');
       setBusy(false);
@@ -131,12 +135,34 @@ export default function AccountSheet({ diary, onClose }) {
           </label>
         )}
 
+        {signingUp && (
+          <label className={styles.check}>
+            <input
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={(e) => setAgeConfirmed(e.target.checked)}
+              disabled={busy}
+            />
+            <span>만 14세 이상입니다</span>
+          </label>
+        )}
+
         <p className={styles.note}>
           {signingUp
             ? `${hasDiary ? '지금까지 기록한 애니는 새 계정으로 옮겨져요. ' : ''}이메일을 받지 않아서 비밀번호를 잊으면 되찾을 수 없어요. 꼭 기억해 두세요.`
             : hasDiary
               ? '이 기기에서 기록한 애니는 로그인한 계정의 기록에 합쳐져요.'
               : '로그인하면 계정에 기록해 둔 애니를 불러와요.'}
+          {signingUp && (
+            <>
+              {' '}
+              아이디와 비밀번호를 어떻게 다루는지는{' '}
+              <a href={PRIVACY_PATH} target="_blank" rel="noreferrer">
+                개인정보 처리방침
+              </a>
+              에서 볼 수 있어요.
+            </>
+          )}
         </p>
 
         {error && (

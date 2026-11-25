@@ -91,17 +91,14 @@ export const diaryRepository = {
     return inOrder(() => call('PUT', `/records/${animeId}/review`, normalizeReview(review)));
   },
 
-  reset() {
-    return inOrder(() => call('DELETE'));
-  },
-
   // The account calls below change who the browser is, then resolve to the
   // diary it now has.
 
   // Makes an account out of the diary already in this browser.
-  signup(loginId, password) {
+  // `ageConfirmed` is the "14 or over" box; the server refuses without it.
+  signup(loginId, password, ageConfirmed) {
     return inOrder(async () => {
-      await call('POST', '/signup', { loginId, password }, AUTH_API);
+      await call('POST', '/signup', { loginId, password, ageConfirmed }, AUTH_API);
       return call('GET');
     });
   },
@@ -111,6 +108,15 @@ export const diaryRepository = {
   login(loginId, password) {
     return inOrder(async () => {
       await call('POST', '/login', { loginId, password }, AUTH_API);
+      return call('GET');
+    });
+  },
+
+  // Deletes the account and everything recorded under it, on every device.
+  // The password is asked again; rejects if it is wrong.
+  deleteAccount(password) {
+    return inOrder(async () => {
+      await call('POST', '/delete', { password }, AUTH_API);
       return call('GET');
     });
   },

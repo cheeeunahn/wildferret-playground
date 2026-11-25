@@ -5,25 +5,30 @@
   background: linear-gradient(#9fdcff 0 38%, #5fcdea 38%, #1f86c9) center / cover;
 }
 
-/* The drawing ends at her thighs, so it fades out toward the bottom and the
-   title sits over the fade. */
+/* She stands a little higher than the drawing's centre, so her face stays
+   clear of the buttons, and fades out where the panel begins. */
 .kotori {
   position: absolute;
-  bottom: 17%;
+  top: 4%;
   left: 50%;
-  height: 72%;
+  height: 66%;
   transform: translateX(-50%);
   filter: drop-shadow(0 6px 14px rgb(20 40 80 / 0.25));
-  mask-image: linear-gradient(#000 62%, transparent 96%);
+  mask-image: linear-gradient(#000 58%, transparent 92%);
   pointer-events: none;
 }
 
-/* Title and button over a soft band of deeper water, for contrast. */
+/* Title and buttons start around the middle of the screen, where a login
+   screen usually has them, over a band of deeper water for contrast. The
+   policy link is pushed to the bottom edge. */
 .panel {
   position: absolute;
-  inset: auto 0 0;
-  padding: 90px 24px calc(20px + env(safe-area-inset-bottom));
-  background: linear-gradient(transparent, rgb(18 92 150 / 0.6) 45%);
+  inset: 43% 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 44px 24px calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, rgb(18 92 150 / 0.72) 26%, rgb(14 72 128 / 0.9));
   text-align: center;
 }
 
@@ -46,10 +51,17 @@
   text-shadow: 0 1px 8px rgb(10 50 110 / 0.7);
 }
 
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+/* The main button: 로그인, or 기록하기 once logged in. */
 .cta {
   width: 100%;
   height: 58px;
-  margin-top: 30px;
   border: 0;
   border-radius: 999px;
   background: linear-gradient(135deg, #ff8fb8, #ff5a96);
@@ -71,11 +83,34 @@
     0 8px 16px rgb(10 50 110 / 0.3);
 }
 
-/* One line under the button. It keeps its height while empty, so the title
-   does not jump when the diary finishes loading. */
+/* The quieter second button: carry on without an account. */
+.guest {
+  width: 100%;
+  height: 52px;
+  border: 2px solid rgb(255 255 255 / 0.9);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.guest:active {
+  background: rgb(255 255 255 / 0.28);
+}
+
+.cta:disabled,
+.guest:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .account {
   min-height: 20px;
-  margin: 18px 0 0;
+  margin: 2px 0 0;
   color: #fff;
   font-size: 13px;
   line-height: 20px;
@@ -97,4 +132,13 @@
 .link:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+.privacy {
+  align-self: center;
+  margin-top: auto;
+  padding-top: 12px;
+  color: rgb(255 255 255 / 0.8);
+  font-size: 11px;
+  text-underline-offset: 3px;
 }
