@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { animeRepository } from '../data/animeRepository';
 
-const MIN_LENGTH = 2;
-const DEBOUNCE_MS = 400;
+const MIN_LENGTH = 1;
+const DEBOUNCE_MS = 300;
 
 // Searches once the user pauses typing. status: idle | loading | ready | error
 export function useAnimeSearch(query) {
   const term = query.trim();
   const [state, setState] = useState({ term: '', status: 'idle', results: [], error: null });
+
+  // Fetch the popular titles before the first keystroke needs them.
+  useEffect(() => {
+    animeRepository.warmUp();
+  }, []);
 
   useEffect(() => {
     if (term.length < MIN_LENGTH) return undefined;

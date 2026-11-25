@@ -2,26 +2,45 @@
 // objects: { id, title, nativeTitle, year, format, cover, color,
 // countsForDepth }. Swap the body for our own API later.
 import { countsForDepth } from '../domain/depth';
+import { normalize, rankByQuery } from '../domain/search';
 
 const ENDPOINT = 'https://graphql.anilist.co';
+
+const MEDIA_FIELDS = `
+  id
+  format
+  seasonYear
+  startDate { year }
+  title { english romaji native }
+  synonyms
+  coverImage { medium large color }
+`;
+
+const AIRED = 'type: ANIME, isAdult: false, status_in: [FINISHED, RELEASING]';
 
 const SEARCH_QUERY = `
 query ($search: String) {
   Page(perPage: 10) {
-    media(search: $search, type: ANIME, isAdult: false, status_in: [FINISHED, RELEASING]) {
-      id
-      format
-      seasonYear
-      startDate { year }
-      title { english romaji native }
-      coverImage { medium large color }
-    }
+    media(search: $search, ${AIRED}) { ${MEDIA_FIELDS} }
   }
 }`;
 
-// AniList allows few requests per minute, so identical searches are answered
-// from memory.
-const cache = new Map();
+// AniList's own search matches whole words, so "s" or "sp" finds nothing
+// useful. The most popular titles are fetched once, in one request, and
+// matched here by prefix instead.
+const POPULAR_PAGES = [1, 2, 3, 4];
+const POPULAR_QUERY = `
+query {
+  ${POPULAR_PAGES.map(
+    (page) => `p${page}: Page(page: ${page}, perPage: 50) {
+    media(sort: POPULARITY_DESC, ${AIRED}) { ${MEDIA_FIELDS} }
+  }`,
+  ).join('\n  ')}
+}`;
+const POPULAR_KEY = 'otaku-diary:popular:v1';
+const POPULAR_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const LIVE_MIN_LENGTH = 2;
+const MAX_RESULTS = 12;
 
 function toAnime(media) {
   return {
@@ -36,27 +55,103 @@ function toAnime(media) {
   };
 }
 
+// An anime plus every name it can be found by.
+function toEntry(media) {
+  const names = [media.title.english, media.title.romaji, ...(media.synonyms ?? [])];
+  return {
+    anime: toAnime(media),
+    names: names.filter(Boolean).map(normalize).filter(Boolean),
+  };
+}
+
+async function request(query, variables, signal) {
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({ query, variables }),
+    signal,
+  });
+  if (response.status === 429) {
+    throw new Error('검색이 너무 잦아요. 잠시 후 다시 시도해 주세요.');
+  }
+  if (!response.ok) {
+    throw new Error('검색에 실패했어요. 잠시 후 다시 시도해 주세요.');
+  }
+  return (await response.json()).data;
+}
+
+function readPopularCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(POPULAR_KEY));
+    if (cached && Date.now() - cached.at < POPULAR_MAX_AGE_MS) return cached.entries;
+  } catch {
+    // Unreadable cache: fetch again.
+  }
+  return null;
+}
+
+async function fetchPopular() {
+  const cached = readPopularCache();
+  if (cached) return cached;
+  const data = await request(POPULAR_QUERY);
+  const entries = POPULAR_PAGES.flatMap((page) => data[`p${page}`].media).map(toEntry);
+  try {
+    localStorage.setItem(POPULAR_KEY, JSON.stringify({ at: Date.now(), entries }));
+  } catch {
+    // No storage: it stays in memory for this visit.
+  }
+  return entries;
+}
+
+// One shared load. A failed load is forgotten so the next search retries,
+// and search carries on with live results only.
+let popular = null;
+function loadPopular() {
+  popular ??= fetchPopular().catch(() => {
+    popular = null;
+    return [];
+  });
+  return popular;
+}
+
+// AniList allows few requests per minute, so identical searches are answered
+// from memory.
+const liveCache = new Map();
+async function searchLive(key, signal) {
+  if (liveCache.has(key)) return liveCache.get(key);
+  const data = await request(SEARCH_QUERY, { search: key }, signal);
+  const results = (data?.Page?.media ?? []).map(toAnime);
+  liveCache.set(key, results);
+  return results;
+}
+
 export const animeRepository = {
+  // Call ahead of the first search so one-letter queries answer at once.
+  warmUp() {
+    loadPopular();
+  },
+
+  // Popular titles that start with the query come first, then whatever
+  // AniList's own search adds.
   async search(query, { signal } = {}) {
     const key = query.trim().toLowerCase();
     if (!key) return [];
-    if (cache.has(key)) return cache.get(key);
 
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', accept: 'application/json' },
-      body: JSON.stringify({ query: SEARCH_QUERY, variables: { search: key } }),
-      signal,
-    });
-    if (response.status === 429) {
-      throw new Error('검색이 너무 잦아요. 잠시 후 다시 시도해 주세요.');
+    const fromPopular = rankByQuery(await loadPopular(), key);
+    if (key.length < LIVE_MIN_LENGTH) return fromPopular;
+
+    let fromLive;
+    try {
+      fromLive = await searchLive(key, signal);
+    } catch (error) {
+      // The live search failing is only fatal when there is nothing else.
+      if (error.name === 'AbortError' || fromPopular.length === 0) throw error;
+      fromLive = [];
     }
-    if (!response.ok) {
-      throw new Error('검색에 실패했어요. 잠시 후 다시 시도해 주세요.');
-    }
-    const body = await response.json();
-    const results = (body.data?.Page?.media ?? []).map(toAnime);
-    cache.set(key, results);
-    return results;
+    const seen = new Set(fromPopular.map((anime) => anime.id));
+    return [...fromPopular, ...fromLive.filter((anime) => !seen.has(anime.id))].slice(
+      0,
+      MAX_RESULTS,
+    );
   },
 };
