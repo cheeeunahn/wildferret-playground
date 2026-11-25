@@ -1,19 +1,21 @@
 // The only file that knows the diary lives on our server (worker/diary.js).
-// Every method is one request and resolves to the whole diary,
-// `{ profile, records }`. The visitor is recognised by an HttpOnly cookie
-// the server sets, so there is no id to handle here.
+// Every diary method is one request and resolves to the whole diary,
+// `{ profile, records, auth }`. The visitor is recognised by an HttpOnly
+// cookie the server sets, so there is no id to handle here. Signing up or
+// logging in (worker/auth.js) ties that diary to an account.
 
 import { normalizeReview } from '../domain/review';
 
 const API = '/api/diary';
+const AUTH_API = '/api/auth';
 // Where the diary lived before the server: imported once, then set aside.
 const LOCAL_KEY = 'otaku-diary:v1';
 const IMPORTED_KEY = 'otaku-diary:v1:imported';
 
-async function call(method, path = '', body) {
+async function call(method, path = '', body, base = API) {
   let response;
   try {
-    response = await fetch(API + path, {
+    response = await fetch(base + path, {
       method,
       headers: body ? { 'content-type': 'application/json' } : undefined,
       body: body ? JSON.stringify(body) : undefined,
@@ -91,5 +93,33 @@ export const diaryRepository = {
 
   reset() {
     return inOrder(() => call('DELETE'));
+  },
+
+  // The account calls below change who the browser is, then resolve to the
+  // diary it now has.
+
+  // Makes an account out of the diary already in this browser.
+  signup(loginId, password) {
+    return inOrder(async () => {
+      await call('POST', '/signup', { loginId, password }, AUTH_API);
+      return call('GET');
+    });
+  },
+
+  // Opens the account's diary. Anything recorded here before logging in is
+  // merged into it by the server.
+  login(loginId, password) {
+    return inOrder(async () => {
+      await call('POST', '/login', { loginId, password }, AUTH_API);
+      return call('GET');
+    });
+  },
+
+  // Leaves a blank diary here; the account's diary stays on the server.
+  logout() {
+    return inOrder(async () => {
+      await call('POST', '/logout', undefined, AUTH_API);
+      return call('GET');
+    });
   },
 };

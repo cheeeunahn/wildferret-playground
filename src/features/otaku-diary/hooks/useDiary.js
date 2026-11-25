@@ -6,7 +6,8 @@ const BLANK_PROFILE = { nickname: '', onboarded: false };
 
 // The diary as screens use it: profile, records, depth, and the ways to
 // change them. `error` is set when the diary could not be loaded; `reload`
-// tries again.
+// tries again. `loginId` is the account the diary belongs to, or null while
+// the visitor has not signed up or logged in.
 export function useDiary() {
   const [diary, setDiary] = useState(null);
   const [error, setError] = useState(null);
@@ -50,13 +51,24 @@ export function useDiary() {
     [],
   );
   const reset = useCallback(async () => {
-    setDiary({ profile: BLANK_PROFILE, records: [] });
+    setDiary((d) => ({ ...d, profile: BLANK_PROFILE, records: [] }));
     try {
       setDiary(await diaryRepository.reset());
     } catch (failure) {
       console.warn('diary not reset:', failure.message);
     }
   }, []);
+
+  // These reject with a message for the user when the server says no.
+  const signup = useCallback(
+    async (loginId, password) => setDiary(await diaryRepository.signup(loginId, password)),
+    [],
+  );
+  const login = useCallback(
+    async (loginId, password) => setDiary(await diaryRepository.login(loginId, password)),
+    [],
+  );
+  const logout = useCallback(async () => setDiary(await diaryRepository.logout()), []);
 
   const records = diary?.records;
   const depth = useMemo(() => depthOfRecords(records ?? []), [records]);
@@ -68,6 +80,10 @@ export function useDiary() {
     profile: diary?.profile ?? BLANK_PROFILE,
     records: records ?? [],
     depth,
+    loginId: diary?.auth?.loginId ?? null,
+    signup,
+    login,
+    logout,
     saveProfile,
     addAnime,
     saveReview,

@@ -22,7 +22,7 @@
 .panel {
   position: absolute;
   inset: auto 0 0;
-  padding: 90px 24px calc(40px + env(safe-area-inset-bottom));
+  padding: 90px 24px calc(20px + env(safe-area-inset-bottom));
   background: linear-gradient(transparent, rgb(18 92 150 / 0.6) 45%);
   text-align: center;
 }
@@ -69,4 +69,32 @@
   box-shadow:
     0 2px 0 #d83f7b,
     0 8px 16px rgb(10 50 110 / 0.3);
+}
+
+/* One line under the button. It keeps its height while empty, so the title
+   does not jump when the diary finishes loading. */
+.account {
+  min-height: 20px;
+  margin: 18px 0 0;
+  color: #fff;
+  font-size: 13px;
+  line-height: 20px;
+  text-shadow: 0 1px 6px rgb(10 50 110 / 0.7);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link:disabled {
+  opacity: 0.6;
+  cursor: default;
 }

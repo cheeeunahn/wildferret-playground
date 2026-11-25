@@ -1,6 +1,7 @@
 // /api/diary: one visitor's profile and recorded anime. Every route answers
-// with the whole diary, `{ profile, records }`, newest record first — the
-// same shape the browser used to keep in localStorage.
+// with the whole diary, `{ profile, records, auth }`, newest record first.
+// `auth.loginId` is the account the diary belongs to, or null for a visitor
+// who has not signed up (see auth.js).
 //
 //   GET    /api/diary                         read
 //   PATCH  /api/diary/profile                 { nickname?, onboarded?, visitedRoom? }
@@ -14,6 +15,7 @@
 
 import { countsForDepth } from '../src/features/otaku-diary/domain/depth.js';
 import { normalizeReview } from '../src/features/otaku-diary/domain/review.js';
+import { loginIdOf } from './auth.js';
 import { HttpError, assertSameOrigin, json, readJson } from './http.js';
 import { newSession, readSession } from './session.js';
 
@@ -227,12 +229,15 @@ export async function handleDiary(request, env, url) {
   let userId = session?.userId ?? null;
   let cookie = session?.cookie ?? null;
 
-  if (matched.name === 'read') return json(await readDiary(db, userId), { cookie });
+  const respond = async () =>
+    json({ ...(await readDiary(db, userId)), auth: { loginId: await loginIdOf(env, userId) } }, { cookie });
+
+  if (matched.name === 'read') return respond();
 
   assertSameOrigin(request, url);
   if (matched.name === 'reset') {
     if (userId) await resetDiary(db, userId);
-    return json(EMPTY, { cookie });
+    return respond();
   }
 
   // Parse before creating anyone, so a malformed request leaves no user row.
@@ -251,5 +256,5 @@ export async function handleDiary(request, env, url) {
   if (matched.name === 'add') await addRecord(db, userId, body);
   if (matched.name === 'review') await saveReview(db, userId, matched.animeId, body);
   if (matched.name === 'import') await importDiary(db, userId, body);
-  return json(await readDiary(db, userId), { cookie });
+  return respond();
 }

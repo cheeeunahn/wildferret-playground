@@ -37,7 +37,7 @@ src/
       ToolPage.jsx
       catalog/              tool registry + one folder per tool
     otaku-diary/            the anime diary (see below)
-worker/                     the Worker behind /api/* (the diary API)
+worker/                     the Worker behind /api/* (diary API, accounts)
 migrations/                 the D1 tables, one SQL file per change
 scripts/
   kotori-voice.mjs          regenerates the diary's voice clips
@@ -115,11 +115,22 @@ once and cached for a week, so a search returns results from its first letter.
 
 **The diary's backend.** The nickname and the recorded anime live in a
 Cloudflare D1 database, behind `/api/diary` (routes are listed at the top of
-`worker/diary.js`). There is no login yet: a visitor is recognised by a random
-token in an HttpOnly cookie, set on their first write, and the database keeps
-only the token's hash. So a diary belongs to one browser for now. The tables
-keep users, sessions and login identities apart (`migrations/0001_diary.sql`),
-so that a login provider such as Kakao can later attach to an existing diary.
+`worker/diary.js`). A visitor is recognised by a random token in an HttpOnly
+cookie, set on their first write, and the database keeps only the token's
+hash. Without an account, a diary belongs to that one browser.
+
+**Accounts.** The title screen offers 로그인 · 회원가입 with an ID and a
+password (`worker/auth.js`). Signing up turns the diary already in the browser
+into the account's diary. Logging in on another device opens that diary, and an
+anonymous diary already made on that device is merged into it. Logging out
+leaves the browser with a blank diary; the account's stays on the server.
+
+- Passwords are stored only as a salted PBKDF2-SHA256 hash, 100,000 rounds
+  (the most Workers allows), in the `credentials` table.
+- Five wrong passwords in a row lock an ID for five minutes.
+- There is no email, so there is no password recovery: a forgotten password
+  can only be reset by hand in the database. The sign-up form says so.
+- The empty `identities` table is kept for an external login provider later.
 A diary recorded in `localStorage` before the backend existed is sent to the
 server once, on the next visit, and merged.
 

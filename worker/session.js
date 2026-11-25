@@ -24,6 +24,11 @@ function cookieFor(token, url, maxAgeDays = TTL_DAYS) {
   return `${COOKIE}=${token}; Path=/api; Max-Age=${maxAgeDays * 86400}; HttpOnly; SameSite=Lax${secure}`;
 }
 
+// The Set-Cookie value that makes the browser forget its session.
+export function clearedCookie(url) {
+  return cookieFor('', url, 0);
+}
+
 async function hashOf(token) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
@@ -34,8 +39,9 @@ function newToken() {
   return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-// Resolves to `{ userId, cookie }` for a valid session, where `cookie` is a
-// Set-Cookie value when the session was renewed; otherwise null.
+// Resolves to `{ userId, tokenHash, cookie }` for a valid session, where
+// `cookie` is a Set-Cookie value when the session was renewed; otherwise
+// null.
 export async function readSession(request, url, db) {
   const token = readCookie(request);
   if (!token) return null;
@@ -55,7 +61,7 @@ export async function readSession(request, url, db) {
       .run();
     cookie = cookieFor(token, url);
   }
-  return { userId: row.user_id, cookie };
+  return { userId: row.user_id, tokenHash, cookie };
 }
 
 // The statement that stores a new session for `userId`, plus its cookie.
