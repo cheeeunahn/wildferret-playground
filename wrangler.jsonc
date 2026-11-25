@@ -3,6 +3,9 @@
   "name": "wildferret-playground",
   "compatibility_date": "2026-08-14",
   "main": "./worker/index.js",
+  // 커스텀 도메인만 쓰면 미리보기 URL이 꺼진 채라, PR마다 workers.dev
+  // 미리보기 링크가 생기도록 켜 둔다. 링크는 누구나 열 수 있다.
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application",
