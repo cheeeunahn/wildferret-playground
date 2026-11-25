@@ -5,9 +5,12 @@ import DialogueBox from '../components/DialogueBox';
 import SpeechBubble from '../components/SpeechBubble';
 import { MOODS, pickChatter } from '../domain/chatter';
 import { GUIDE_NAME, ROOM_TOUR } from '../domain/onboarding';
+import { useVoice } from '../hooks/useVoice';
 import styles from './RoomScreen.module.css';
 
+// How long a line stays up: until its clip ends, or this long when silent.
 const CHATTER_MS = 4000;
+const CHATTER_AFTER_VOICE_MS = 600;
 
 // Inside the submarine: a small café with 코토리 and the bookshelf
 // that holds the user's recorded anime. On the first visit (`showTour`) she
@@ -19,16 +22,37 @@ export default function RoomScreen({ diary, showTour, onTourEnd, onOpenBookshelf
 
   // Hidden extra: a tap on her brings up a line, which fades after a while.
   const [chatter, setChatter] = useState(null);
+  const voice = useVoice();
   useEffect(() => {
     if (!chatter) return undefined;
-    const timer = setTimeout(() => setChatter(null), CHATTER_MS);
-    return () => clearTimeout(timer);
+    const clear = () => setChatter((now) => (now === chatter ? null : now));
+    if (!chatter.audio) {
+      const timer = setTimeout(clear, CHATTER_MS);
+      return () => clearTimeout(timer);
+    }
+    let timer;
+    const afterVoice = () => {
+      timer = setTimeout(clear, CHATTER_AFTER_VOICE_MS);
+    };
+    // `error` too, so a clip that fails to load does not leave her talking.
+    chatter.audio.addEventListener('ended', afterVoice);
+    chatter.audio.addEventListener('error', afterVoice);
+    return () => {
+      clearTimeout(timer);
+      chatter.audio.removeEventListener('ended', afterVoice);
+      chatter.audio.removeEventListener('error', afterVoice);
+    };
   }, [chatter]);
+
+  // Leaving the room cuts her off.
+  const { play: speak, stop: hush } = voice;
+  useEffect(() => hush, [hush]);
 
   const chat = () => {
     const context = { nickname: diary.profile.nickname, count: diary.depth.count };
-    // A new object each time, so tapping again restarts the timer.
-    setChatter(pickChatter(context, chatter?.text, Math.random()));
+    const line = pickChatter(context, chatter?.text, Math.random());
+    // A new object each time, so tapping again starts over.
+    setChatter({ ...line, audio: speak(line.voice) });
   };
 
   // Her face while she speaks; null (the resting drawing) if that mood has
@@ -78,6 +102,7 @@ export default function RoomScreen({ diary, showTour, onTourEnd, onOpenBookshelf
             key={tourStep}
             speaker={GUIDE_NAME}
             text={tourLine.text}
+            voice={tourLine.voice}
             onAdvance={advanceTour}
           />
         </>

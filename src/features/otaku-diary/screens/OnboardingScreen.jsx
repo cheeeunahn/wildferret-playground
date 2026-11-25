@@ -68,6 +68,7 @@ export default function OnboardingScreen({ diary, onFinish }) {
         key={step}
         speaker={GUIDE_NAME}
         text={line.text}
+        voice={line.voice}
         onAdvance={waitsForAction ? undefined : actions.advance}
       >
         {step === 'greet' && <NicknameInput onSubmit={submitName} />}

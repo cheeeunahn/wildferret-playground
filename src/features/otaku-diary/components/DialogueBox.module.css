@@ -37,6 +37,21 @@
   box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
 }
 
+.sound {
+  position: absolute;
+  top: -15px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid #ffb7d2;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .text {
   position: relative;
   margin: 0;
