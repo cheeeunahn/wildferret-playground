@@ -4,9 +4,10 @@
   --shelf-left: 0%;
   --shelf-bottom: 29%;
   --shelf-width: 50%;
-  --chibi-right: 10%;
-  --chibi-bottom: 6%;
-  --chibi-width: 40%;
+  --kotori-right: -2%;
+  --kotori-bottom: 2%;
+  /* She stands close to the viewer, in front of the counter. */
+  --kotori-height: 66%;
   position: relative;
   height: 100%;
   overflow: hidden;
@@ -79,7 +80,6 @@
   white-space: nowrap;
   translate: -50% 0;
   box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
-  animation: hint 1.8s ease-in-out infinite;
 }
 
 .shelfFallback {
@@ -90,43 +90,73 @@
   background: repeating-linear-gradient(#e9d9c8 0 6px, #ffd3e2 6px 22%);
 }
 
-.chibi {
+.kotori {
   position: absolute;
-  right: var(--chibi-right);
-  bottom: var(--chibi-bottom);
-  display: flex;
-  width: var(--chibi-width);
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  right: var(--kotori-right);
+  bottom: var(--kotori-bottom);
+  height: var(--kotori-height);
+  /* Taps pass through her to the bookshelf behind. */
+  pointer-events: none;
 }
 
-.chibi img {
+/* Height drives her size; the width follows the drawing. */
+.kotori .sprite {
   display: block;
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 100%;
   filter: drop-shadow(0 8px 8px rgb(60 40 30 / 0.22));
 }
 
-.chibiFallback {
-  width: 60%;
-  aspect-ratio: 1;
-  border-radius: 50%;
+/* Hidden drawings keep their place, so the visible one never shifts. */
+.kotori .sprite[data-hidden] {
+  visibility: hidden;
+}
+
+.kotori .mood {
+  position: absolute;
+  inset: 0;
+}
+
+/* Only her figure takes taps, not the empty margins of the drawing, so the
+   bookshelf beside her stays reachable. */
+.kotoriTap {
+  position: absolute;
+  inset: 2% 22% 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Her line, above her head. Longer than a nudge, so it wraps. */
+.kotori .chatter {
+  position: absolute;
+  bottom: 98%;
+  left: 50%;
+  z-index: 2;
+  width: max-content;
+  max-width: 220px;
+  white-space: normal;
+  text-align: center;
+  word-break: keep-all;
+  transform: translateX(-50%);
+  animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+.kotoriFallback {
+  display: block;
+  width: 90px;
+  height: 100%;
+  border-radius: 45px 45px 12px 12px;
   background: #ffb7d2;
-}
-
-.line {
-  font-size: 13px;
-}
-
-@keyframes hint {
-  50% {
-    translate: -50% -4px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tag {
-    animation: none;
-  }
 }

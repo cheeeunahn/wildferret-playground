@@ -8,6 +8,7 @@ export function useOnboarding() {
       submitName: (nickname) => dispatch({ type: 'nameSubmitted', nickname }),
       pickAnime: (anime) => dispatch({ type: 'animePicked', anime }),
       advance: () => dispatch({ type: 'advanced' }),
+      enterSubmarine: () => dispatch({ type: 'submarineEntered' }),
     }),
     [],
   );

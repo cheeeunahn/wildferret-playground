@@ -12,14 +12,15 @@ import styles from './OnboardingScreen.module.css';
 
 const FLOAT_MS = 1100;
 
-// The first-visit visual novel: greeting, name, first search, first dive.
+// The first-visit visual novel: greeting, name, first search, first dive,
+// and an invitation into the submarine, which is how it ends.
 export default function OnboardingScreen({ diary, onFinish }) {
   const [state, actions] = useOnboarding();
   const { step } = state;
   const line = lineFor(state);
-  const atSea = step === 'dive' || step === 'farewell';
-  // Starts true: the first line is typed as soon as the screen opens.
-  const [typing, setTyping] = useState(true);
+  const atSea = step === 'dive' || step === 'invite';
+  // Steps the user answers by doing something, not by tapping the text box.
+  const waitsForAction = step === 'greet' || step === 'search' || step === 'invite';
 
   useEffect(() => {
     if (step === 'done') onFinish();
@@ -44,10 +45,16 @@ export default function OnboardingScreen({ diary, onFinish }) {
       className={styles.screen}
       style={!atSea && background ? { backgroundImage: `url(${background})` } : undefined}
     >
-      {atSea && <FirstDive anime={state.firstAnime} depth={diary.depth} />}
+      {atSea && (
+        <FirstDive
+          anime={state.firstAnime}
+          depth={diary.depth}
+          onSubmarineClick={step === 'invite' ? actions.enterSubmarine : undefined}
+        />
+      )}
 
       <Character
-        expression={typing ? line.expression : (line.settled ?? line.expression)}
+        expression={line.expression}
         size={step === 'search' || atSea ? 'small' : 'full'}
       />
 
@@ -61,8 +68,7 @@ export default function OnboardingScreen({ diary, onFinish }) {
         key={step}
         speaker={GUIDE_NAME}
         text={line.text}
-        onTypingChange={setTyping}
-        onAdvance={step === 'greet' || step === 'search' ? undefined : actions.advance}
+        onAdvance={waitsForAction ? undefined : actions.advance}
       >
         {step === 'greet' && <NicknameInput onSubmit={submitName} />}
       </DialogueBox>
@@ -72,7 +78,7 @@ export default function OnboardingScreen({ diary, onFinish }) {
 
 // The submarine floats for a moment with the old count, then the anime goes
 // in and it sinks to the new one.
-function FirstDive({ anime, depth }) {
+function FirstDive({ anime, depth, onSubmarineClick }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -84,7 +90,12 @@ function FirstDive({ anime, depth }) {
 
   return (
     <div className={styles.sea}>
-      <SeaScene depth={loaded ? depth : before} cargo={loaded ? anime : null} />
+      <SeaScene
+        depth={loaded ? depth : before}
+        cargo={loaded ? anime : null}
+        onSubmarineClick={onSubmarineClick}
+        nudge={onSubmarineClick ? '여기를 눌러봐!' : null}
+      />
     </div>
   );
 }

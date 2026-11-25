@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { depthFor } from '../domain/depth';
 import { Poster } from './AnimeCard';
+import SeaLife from './SeaLife';
 import SpeechBubble from './SpeechBubble';
 import Submarine from './Submarine';
 import Waves from './Waves';
@@ -72,6 +73,7 @@ export default function SeaScene({ depth, cargo, onSubmarineClick, nudge, childr
     >
       <div className={styles.sky} />
       <div className={styles.water}>
+        <SeaLife />
         <span className={styles.bubble} style={{ left: '18%', animationDelay: '0s' }} />
         <span className={styles.bubble} style={{ left: '72%', animationDelay: '1.6s' }} />
         <span className={styles.bubble} style={{ left: '44%', animationDelay: '3.1s' }} />

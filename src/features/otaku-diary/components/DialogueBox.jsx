@@ -1,16 +1,10 @@
-import { useEffect } from 'react';
 import { useTypewriter } from '../hooks/useTypewriter';
 import styles from './DialogueBox.module.css';
 
 // Visual-novel text box. A tap finishes the line; a second tap calls
 // `onAdvance`. `children` (an input, say) appear once the line is complete.
-export default function DialogueBox({ speaker, text, onAdvance, onTypingChange, children }) {
+export default function DialogueBox({ speaker, text, onAdvance, children }) {
   const { shown, done, skip } = useTypewriter(text);
-
-  // Lets the caller know when the line has finished typing.
-  useEffect(() => {
-    onTypingChange?.(!done);
-  }, [done, onTypingChange]);
 
   const handleTap = () => {
     if (!done) skip();

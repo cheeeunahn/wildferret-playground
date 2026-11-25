@@ -15,13 +15,15 @@ export default function OtakuDiaryPage() {
   const [firstRoomVisit, setFirstRoomVisit] = useState(false);
   const { saveProfile, reset } = diary;
 
+  // Onboarding ends with the user stepping into the submarine.
   const finishOnboarding = useCallback(() => {
-    saveProfile({ onboarded: true });
-    setScreen('main');
+    saveProfile({ onboarded: true, visitedRoom: true });
+    setFirstRoomVisit(true);
+    setScreen('room');
   }, [saveProfile]);
 
   const enterSubmarine = () => {
-    // The guide points out the bookshelf on the first visit only.
+    // The guide shows the room around on the first visit only.
     setFirstRoomVisit(!diary.profile.visitedRoom);
     saveProfile({ visitedRoom: true });
     setScreen('room');
@@ -50,7 +52,8 @@ export default function OtakuDiaryPage() {
         {screen === 'room' && (
           <RoomScreen
             diary={diary}
-            showShelfHint={firstRoomVisit}
+            showTour={firstRoomVisit}
+            onTourEnd={() => setFirstRoomVisit(false)}
             onOpenBookshelf={() => setScreen('library')}
             onBack={() => setScreen('main')}
           />

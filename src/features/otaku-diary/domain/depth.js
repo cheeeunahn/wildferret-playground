@@ -17,6 +17,8 @@ export const LAYERS = [
   { id: 'hadal', name: '초심해층', from: 500, top: 6000, bottom: 11000 },
 ];
 
+const SURFACE_PER_TITLE = 22;
+
 function layerIndexFor(count) {
   let index = 0;
   LAYERS.forEach((layer, i) => {
@@ -33,9 +35,10 @@ function metresFor(count, index) {
     const span = layer.bottom - layer.top;
     return layer.top + span * (1 - Math.exp(-(count - layer.from) / 500));
   }
-  // The surface layer starts at count 0, which is 0m; 9 titles is 198m.
-  const steps = next.from - layer.from + (index === 0 ? -1 : 0);
-  const perTitle = (layer.bottom - layer.top) / (index === 0 ? 9 : steps);
+  // The surface layer is a flat 22m per title: 9 titles reach 198m, and the
+  // tenth crosses into the next layer at 200m.
+  const perTitle =
+    index === 0 ? SURFACE_PER_TITLE : (layer.bottom - layer.top) / (next.from - layer.from);
   return layer.top + (count - layer.from) * perTitle;
 }
 
