@@ -1,0 +1,30 @@
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(#9fdcff, #e3f6ff 55%, #5fcdea) center / cover;
+}
+
+.sea {
+  position: absolute;
+  inset: 0;
+  /* The depth readout sits under the sound button. */
+  --readout-top: calc(56px + env(safe-area-inset-top));
+}
+
+/* Top right, as on every other screen. */
+.sound {
+  position: absolute;
+  top: calc(22px + env(safe-area-inset-top));
+  right: 14px;
+  z-index: 11;
+}
+
+.searchSlot {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top));
+  left: 14px;
+  /* Leaves the corner to the sound button. */
+  right: 58px;
+  z-index: 10;
+}

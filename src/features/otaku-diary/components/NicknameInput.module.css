@@ -1,0 +1,47 @@
+.form {
+  display: flex;
+  gap: 8px;
+  animation: rise 0.25s ease-out;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 50px;
+  padding: 0 16px;
+  border: 2px solid #ffb7d2;
+  border-radius: 14px;
+  background: #fff;
+  color: #2b3350;
+  /* 16px keeps iOS from zooming the page on focus. */
+  font-size: 16px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #ff6fa3;
+}
+
+.button {
+  height: 50px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ff8fb8, #ff6fa3);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

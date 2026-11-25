@@ -11,7 +11,7 @@ deployed to Cloudflare Workers as static assets.
 | `/songs/` | the Strudel piece archive and its player |
 | `/tools/` | the tools tab: pick a tool, use it inside the page |
 | `/tools/<tool-id>/` | one tool on its own page, without the site chrome |
-| `/jev-tutorial-kr` | the Jev walkthrough (unlisted; reachable by URL only) |
+| `/otaku-diary` | 애니와 함께하는 바다모험, a phone-sized anime diary (unlisted; reachable by URL only) |
 
 Routing is client-side (`react-router-dom`), so `wrangler.jsonc` sets
 `not_found_handling: "single-page-application"` to serve `index.html` for
@@ -34,6 +34,11 @@ src/
       ToolsPage.jsx
       ToolPage.jsx
       catalog/              tool registry + one folder per tool
+    otaku-diary/            the anime diary (see below)
+scripts/
+  kotori-voice.mjs          regenerates the diary's voice clips
+.github/workflows/
+  claude-code-review.yml    Claude Code review on every pull request
 ```
 
 The repository is organized by feature rather than by file type. A feature owns
@@ -65,31 +70,87 @@ The feature registry automatically supplies the main route and navigation tab.
 A feature can also declare `standaloneRoutes` when it needs routes outside the
 shared site layout, as tools currently does for the full-window tool view.
 
-## The Jev API key
+### An unlisted page
 
-`/jev-tutorial-kr` ends with a drawing pad that calls TypeSafe for real. The key
-stays server-side: the browser posts only the numbers it measured from the
-strokes to `/api/jev`, and `server/jevProxy.js` builds the actual request. That
-one handler is shared by the Vite dev middleware and the Cloudflare Worker, so
-both environments behave the same.
+`src/features/index.js` has two lists for pages that stay out of the
+navigation: `UNLISTED_PAGES` sit inside the site frame, and
+`STANDALONE_PAGES` fill the whole screen themselves, as the anime diary does.
 
-Locally, copy `.dev.vars.example` to `.dev.vars` and fill the key in.
-`.dev.vars` is git-ignored, and it is the file `wrangler dev` already reads, so
-`pnpm dev` and `pnpm wrangler dev` share one copy:
+## The anime diary (`/otaku-diary`)
 
-```sh
-cp .dev.vars.example .dev.vars
+A front-end prototype of 애니와 함께하는 바다모험: the user logs anime they have
+watched, and a submarine dives one step deeper for each title. 코토리, the
+guide character, walks them through it in visual-novel scenes and speaks every
+line in Japanese while the text stays Korean. There is no backend yet.
+
+The flow: title screen → onboarding (nickname, first search, first dive) →
+코토리 invites the user into the submarine → a café inside it, whose bookshelf
+opens the list of recorded anime. Tapping 코토리 in the café makes her say a
+line with a matching expression.
+
+```
+src/features/otaku-diary/
+  OtakuDiaryPage.jsx        picks the screen and starts the music
+  domain/                   pure rules, no React or browser APIs:
+                            depth, onboarding steps, search ranking,
+                            the café lines and the Japanese voice script
+  data/                     the only code that knows where data lives:
+                            AniList for anime, localStorage for the diary
+  hooks/                    state for screens (diary, search, sound, …)
+  screens/                  title, onboarding, sea, café, bookshelf
+  components/               dialogue box, character, sea scene, sea life, …
+  assets/                   art, voice/ clips, music/
 ```
 
-In production it is an encrypted Worker secret — never `vars` in
-`wrangler.jsonc`, which is committed:
+Screens get their state from hooks and never touch storage or the network
+themselves. Both repositories in `data/` are async, so a server can replace
+them without changing the screens.
+
+**Data.** Anime come from the public [AniList](https://anilist.co) API, called
+from the browser (credited in the UI). The 200 most popular titles are fetched
+once and cached for a week, so a search returns results from its first letter.
+The nickname and the recorded anime live in the visitor's `localStorage`.
+
+**Art.** The character, submarine, café, sea life and backgrounds were drawn
+with Codex image generation.
+
+**Sound.** All sound is behind one on/off toggle, remembered per browser.
+
+- Background music, `assets/music/sparkling-seaside-adventure.mp3`, plays on
+  every screen except the title, quietly, and dips further while 코토리 speaks.
+- Voice clips in `assets/voice/` are generated ahead of time; the app only
+  plays files. They use the コハク voice from
+  [AivisSpeech](https://aivis-project.com/), under the
+  [Aivis Common Model License 1.0](https://github.com/Aivis-Project/ACML/blob/master/ACML-1.0.md).
+
+To change a line, edit `domain/voiceLines.js` (and the Korean text in
+`domain/onboarding.js` or `domain/chatter.js`), start a local AivisSpeech
+engine, and regenerate the clips (ffmpeg is needed too):
 
 ```sh
-pnpm wrangler secret put TYPESAFE_API_KEY
+node scripts/kotori-voice.mjs --list                     # voices and style ids
+node scripts/kotori-voice.mjs --speaker 1878365376       # every clip, コハク
+node scripts/kotori-voice.mjs --speaker 1878365376 --only greet,chatPoke
 ```
 
-Without a key the section still loads; pressing the button reports that the
-server has none.
+## Deploys and pull requests
+
+Cloudflare Workers Builds deploys `main` to
+[playground.wildferret.dev](https://playground.wildferret.dev). Every other
+branch gets a Preview at `<branch>-wildferret-playground.<subdomain>.workers.dev`,
+built with `wrangler preview`; that is why `wrangler.jsonc` has
+`"preview_urls": true` and an empty `"previews": {}` block. Preview links are
+behind Cloudflare Access sign-in.
+
+Cloudflare's bot comments on a pull request once but does not update that
+comment on later pushes, so `.github/workflows/preview-link.yml` keeps a
+"Preview" comment current: it waits for the Workers Builds check on each new
+commit and updates the comment with the result and the branch's link.
+
+Every pull request is also reviewed by Claude Code
+(`.github/workflows/claude-code-review.yml`), which needs a
+`CLAUDE_CODE_OAUTH_TOKEN` repository secret. GitHub only runs it once the
+workflow file is on `main`.
 
 ## Commands
 
@@ -97,6 +158,5 @@ server has none.
 pnpm dev        # vite dev server
 pnpm lint       # oxlint
 pnpm build      # production build into dist/
-pnpm preview    # serve the build locally (no /api/jev — use wrangler dev)
-pnpm wrangler dev   # the build plus the Worker, i.e. /api/jev too
+pnpm preview    # serve the build locally
 ```

@@ -1,0 +1,79 @@
+/* Fills the water; creatures that swim off an edge are clipped by the scene. */
+.life {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* A lane is as wide as the screen and slides one full width plus a margin,
+   carrying its creature from off one edge to off the other. */
+.lane {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  animation: cross linear infinite;
+}
+
+.lane[data-dir='left'] {
+  animation-name: cross-back;
+}
+
+.swimmer,
+.floater {
+  display: block;
+  height: auto;
+  opacity: 0.92;
+}
+
+/* The sprite wiggles up and down inside its lane as it goes. */
+.swimmer {
+  animation: wiggle 3.2s ease-in-out infinite;
+}
+
+.lane[data-dir='left'] .swimmer {
+  scale: -1 1;
+}
+
+.floater {
+  position: absolute;
+  animation: hover ease-in-out infinite;
+}
+
+@keyframes cross {
+  from {
+    transform: translateX(-40%);
+  }
+  to {
+    transform: translateX(105%);
+  }
+}
+
+@keyframes cross-back {
+  from {
+    transform: translateX(105%);
+  }
+  to {
+    transform: translateX(-40%);
+  }
+}
+
+@keyframes wiggle {
+  50% {
+    transform: translateY(7px) rotate(3deg);
+  }
+}
+
+@keyframes hover {
+  50% {
+    transform: translateY(-14px) scale(1.04, 0.96);
+  }
+}
+
+/* Without motion they rest where they are, spread across the water. */
+@media (prefers-reduced-motion: reduce) {
+  .lane,
+  .swimmer,
+  .floater {
+    animation-play-state: paused;
+  }
+}

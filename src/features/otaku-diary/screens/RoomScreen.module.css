@@ -1,0 +1,194 @@
+/* Sprite positions are percentages of the screen, tuned to the empty wall
+   and floor that bg-room.jpg leaves for them. */
+.screen {
+  --shelf-left: 0%;
+  --shelf-bottom: 29%;
+  --shelf-width: 50%;
+  --kotori-right: -2%;
+  --kotori-bottom: 2%;
+  /* She stands close to the viewer, in front of the counter. */
+  --kotori-height: 66%;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(#fdf8f3, #f1e6da) center / cover;
+}
+
+.header {
+  position: absolute;
+  inset: calc(12px + env(safe-area-inset-top)) 14px auto;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back,
+.place {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  color: #2b3350;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgb(60 40 30 / 0.18);
+}
+
+.back {
+  cursor: pointer;
+}
+
+.place {
+  color: #ff5a96;
+}
+
+.bookshelf {
+  position: absolute;
+  left: var(--shelf-left);
+  bottom: var(--shelf-bottom);
+  width: var(--shelf-width);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bookshelf img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgb(60 40 30 / 0.25));
+  transition: scale 0.15s ease;
+}
+
+.bookshelf:active img {
+  scale: 0.97;
+}
+
+.tag {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff8fb8, #ff6fa3);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  translate: -50% 0;
+  box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
+  /* `transform` for the bounce, because `translate` centres the tag. */
+  animation: point 1s ease-in-out infinite;
+}
+
+/* The tail that makes the tag a pointer aimed at the shelf. */
+.tag::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  border: 7px solid transparent;
+  border-top: 9px solid #ff7fad;
+  border-bottom: 0;
+  translate: -50% 0;
+}
+
+@keyframes point {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag {
+    animation: none;
+  }
+}
+
+.shelfFallback {
+  display: block;
+  aspect-ratio: 8 / 11;
+  border: 6px solid #fff;
+  border-radius: 10px;
+  background: repeating-linear-gradient(#e9d9c8 0 6px, #ffd3e2 6px 22%);
+}
+
+.kotori {
+  position: absolute;
+  right: var(--kotori-right);
+  bottom: var(--kotori-bottom);
+  height: var(--kotori-height);
+  /* Taps pass through her to the bookshelf behind. */
+  pointer-events: none;
+}
+
+/* Height drives her size; the width follows the drawing. */
+.kotori .sprite {
+  display: block;
+  width: auto;
+  height: 100%;
+  filter: drop-shadow(0 8px 8px rgb(60 40 30 / 0.22));
+}
+
+/* Hidden drawings keep their place, so the visible one never shifts. */
+.kotori .sprite[data-hidden] {
+  visibility: hidden;
+}
+
+.kotori .mood {
+  position: absolute;
+  inset: 0;
+}
+
+/* Only her figure takes taps, not the empty margins of the drawing, so the
+   bookshelf beside her stays reachable. */
+.kotoriTap {
+  position: absolute;
+  inset: 2% 22% 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Her line, above her head. Longer than a nudge, so it wraps. */
+.kotori .chatter {
+  position: absolute;
+  bottom: 98%;
+  left: 50%;
+  z-index: 2;
+  width: max-content;
+  max-width: 220px;
+  white-space: normal;
+  text-align: center;
+  word-break: keep-all;
+  transform: translateX(-50%);
+  animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+.kotoriFallback {
+  display: block;
+  width: 90px;
+  height: 100%;
+  border-radius: 45px 45px 12px 12px;
+  background: #ffb7d2;
+}
