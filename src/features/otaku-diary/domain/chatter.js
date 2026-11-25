@@ -4,7 +4,7 @@
 // function of what she knows about the user, so a line can mention their
 // name or how much they have recorded; returning null means the line does
 // not apply right now.
-export const MOODS = ['happy', 'surprised', 'wink', 'relaxed'];
+export const MOODS = ['happy', 'pout', 'wink', 'relaxed'];
 
 const LINES = [
   { mood: 'happy', say: ({ nickname }) => `${nickname || '덕후'}, 어서 와! 오늘은 뭐 봤어?` },
@@ -14,9 +14,9 @@ const LINES = [
   { mood: 'happy', say: () => '창밖으로 물고기 지나가는 걸 보고 있으면 시간 가는 줄 몰라.' },
   { mood: 'relaxed', say: () => '깊이 내려갈수록 조용해져서 애니 보기 딱 좋아.' },
   { mood: 'happy', say: ({ count }) => (count > 0 ? `벌써 ${count}편이나 실었네. 대단한데?` : null) },
-  { mood: 'surprised', say: ({ count }) => (count === 0 ? '책장이 텅 비었어. 얼른 한 편 실으러 가자!' : null) },
+  { mood: 'pout', say: ({ count }) => (count === 0 ? '책장이 텅 비었어. 얼른 한 편 실으러 가자!' : null) },
   { mood: 'wink', say: () => '책장이 꽉 차는 날이 기대된다~' },
-  { mood: 'surprised', say: () => '앗, 깜짝이야! 왜 자꾸 눌러~' },
+  { mood: 'pout', say: () => '앗, 깜짝이야! 왜 자꾸 눌러~' },
 ];
 
 // Picks a line that applies and differs from the one just said. `random` is
