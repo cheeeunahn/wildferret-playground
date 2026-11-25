@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useDiary } from './hooks/useDiary';
+import { useMusic } from './hooks/useSound';
 import LibraryScreen from './screens/LibraryScreen';
 import MainScreen from './screens/MainScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
@@ -14,6 +15,8 @@ export default function OtakuDiaryPage() {
   const [screen, setScreen] = useState('title'); // title | onboarding | main | room | library
   const [firstRoomVisit, setFirstRoomVisit] = useState(false);
   const { saveProfile, reset } = diary;
+  // Background music plays on every screen but the title.
+  useMusic(screen !== 'title');
 
   // Onboarding ends with the user stepping into the submarine.
   const finishOnboarding = useCallback(() => {

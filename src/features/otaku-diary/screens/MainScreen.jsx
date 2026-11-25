@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import AnimeSearch from '../components/AnimeSearch';
 import SeaScene from '../components/SeaScene';
+import SoundToggle from '../components/SoundToggle';
 import styles from './MainScreen.module.css';
 
 // Where the user lands after onboarding: search, add, watch the submarine.
@@ -18,9 +19,12 @@ export default function MainScreen({ diary, onEnterSubmarine, onReset }) {
   return (
     <div className={styles.screen}>
       <header className={styles.header}>
-        <h1 className={styles.heading}>
-          <span>{profile.nickname || '덕후'}</span> 님의 다이어리
-        </h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.heading}>
+            <span>{profile.nickname || '덕후'}</span> 님의 다이어리
+          </h1>
+          <SoundToggle />
+        </div>
         <AnimeSearch onPick={add} recordedIds={recordedIds} />
       </header>
 

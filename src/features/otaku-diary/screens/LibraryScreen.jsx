@@ -1,4 +1,5 @@
 import AnimeCard from '../components/AnimeCard';
+import SoundToggle from '../components/SoundToggle';
 import styles from './LibraryScreen.module.css';
 
 // The bookshelf, opened: every anime the user has recorded, newest first.
@@ -14,6 +15,7 @@ export default function LibraryScreen({ diary, onBack }) {
         <h1 className={styles.heading}>
           내 책장 <span>{records.length}편</span>
         </h1>
+        <SoundToggle className={styles.sound} />
       </header>
 
       {records.length === 0 ? (

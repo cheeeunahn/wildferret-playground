@@ -2,10 +2,11 @@ import { assetUrl } from '../assets';
 import { useEffect, useState } from 'react';
 import Character from '../components/Character';
 import DialogueBox from '../components/DialogueBox';
+import SoundToggle from '../components/SoundToggle';
 import SpeechBubble from '../components/SpeechBubble';
 import { MOODS, pickChatter } from '../domain/chatter';
 import { GUIDE_NAME, ROOM_TOUR } from '../domain/onboarding';
-import { useVoice } from '../hooks/useVoice';
+import { useVoice } from '../hooks/useSound';
 import styles from './RoomScreen.module.css';
 
 // How long a line stays up: until its clip ends, or this long when silent.
@@ -78,7 +79,10 @@ export default function RoomScreen({ diary, showTour, onTourEnd, onOpenBookshelf
         <button className={styles.back} type="button" onClick={onBack}>
           ← 바다로
         </button>
-        <span className={styles.place}>잠수함 카페</span>
+        <div className={styles.headerEnd}>
+          <span className={styles.place}>잠수함 카페</span>
+          <SoundToggle />
+        </div>
       </header>
 
       <button

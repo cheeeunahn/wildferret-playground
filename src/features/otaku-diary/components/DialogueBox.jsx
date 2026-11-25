@@ -1,5 +1,6 @@
 import { useTypewriter } from '../hooks/useTypewriter';
-import { useSpokenLine, useVoice } from '../hooks/useVoice';
+import { useSpokenLine } from '../hooks/useSound';
+import SoundToggle from './SoundToggle';
 import styles from './DialogueBox.module.css';
 
 // Visual-novel text box. A tap finishes the line; a second tap calls
@@ -7,7 +8,6 @@ import styles from './DialogueBox.module.css';
 // `voice` is the id of the clip spoken with the line, if it has one.
 export default function DialogueBox({ speaker, text, voice, onAdvance, children }) {
   const { shown, done, skip } = useTypewriter(text);
-  const { muted, toggleMuted } = useVoice();
   useSpokenLine(voice);
 
   const handleTap = () => {
@@ -26,19 +26,7 @@ export default function DialogueBox({ speaker, text, voice, onAdvance, children 
         aria-label={text}
       >
         <span className={styles.speaker}>{speaker}</span>
-        <button
-          className={styles.sound}
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleMuted();
-          }}
-          onKeyDown={(e) => e.stopPropagation()}
-          aria-label={muted ? '목소리 켜기' : '목소리 끄기'}
-          aria-pressed={!muted}
-        >
-          {muted ? '🔇' : '🔊'}
-        </button>
+        <SoundToggle className={styles.sound} />
         {/* The full line holds the box's height; the typed part sits on top. */}
         <p className={styles.text} aria-hidden="true">
           <span className={styles.ghost}>{text}</span>

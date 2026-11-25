@@ -23,6 +23,12 @@
   justify-content: space-between;
 }
 
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .back,
 .place {
   padding: 8px 14px;

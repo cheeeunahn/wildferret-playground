@@ -39,17 +39,8 @@
 
 .sound {
   position: absolute;
-  top: -15px;
+  top: -17px;
   right: 14px;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 2px solid #ffb7d2;
-  border-radius: 50%;
-  background: #fff;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
 }
 
 .text {
