@@ -13,21 +13,33 @@ const FORMAT_LABEL = {
 
 // One anime as a row: poster, title, year and format, plus the user's stars
 // and comment when it has been rated. `action` is whatever the caller wants
-// at the right edge.
-export default function AnimeCard({ anime, action, showReview = true }) {
+// at the right edge. With `onOpen`, the poster and text become one button.
+export default function AnimeCard({ anime, action, onOpen, showReview = true }) {
   const meta = [anime.year, FORMAT_LABEL[anime.format] ?? anime.format]
     .filter(Boolean)
     .join(' · ');
 
-  return (
-    <div className={styles.card}>
+  const content = (
+    <>
       <Poster anime={anime} className={styles.poster} />
-      <div className={styles.body}>
+      <span className={styles.body}>
         <span className={styles.title}>{anime.title}</span>
         <span className={styles.meta}>{meta}</span>
         {showReview && anime.rating > 0 && <Stars rating={anime.rating} className={styles.stars} />}
         {showReview && anime.comment && <span className={styles.comment}>{anime.comment}</span>}
-      </div>
+      </span>
+    </>
+  );
+
+  return (
+    <div className={styles.card}>
+      {onOpen ? (
+        <button className={styles.open} type="button" onClick={onOpen} aria-label={`${anime.title} 작품 정보 보기`}>
+          {content}
+        </button>
+      ) : (
+        content
+      )}
       {action}
     </div>
   );

@@ -17,6 +17,8 @@ const listeners = new Set();
 let voice = null;
 let music = null;
 let musicWanted = false;
+// Something else is playing sound (a trailer), so the music waits.
+let musicHolds = 0;
 let muted = false;
 try {
   muted = localStorage.getItem(MUTED_KEY) === '1';
@@ -39,7 +41,7 @@ function fadeMusic(target) {
 }
 
 function startMusic() {
-  if (muted) return;
+  if (muted || musicHolds > 0) return;
   if (!music) {
     music = new Audio(themeUrl);
     music.loop = true;
@@ -131,5 +133,21 @@ export function useMusic(on) {
     musicWanted = on;
     if (on) startMusic();
     else pauseMusic();
+  }, [on]);
+}
+
+// Pauses the music, and stops 코토리 mid-line, while `on` is true, for
+// another sound source such as a trailer. The music comes back afterwards
+// if the screen still wants it.
+export function useMusicHold(on) {
+  useEffect(() => {
+    if (!on) return undefined;
+    musicHolds += 1;
+    stopVoice();
+    pauseMusic();
+    return () => {
+      musicHolds -= 1;
+      if (musicWanted) startMusic();
+    };
   }, [on]);
 }

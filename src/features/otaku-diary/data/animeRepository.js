@@ -1,7 +1,9 @@
 // The only file that knows anime come from AniList. Screens see plain
 // objects: { id, title, nativeTitle, year, format, cover, color,
-// countsForDepth }. Swap the body for our own API later.
+// countsForDepth }, and getDetails adds the fields from domain/details.js.
+// Swap the body for our own API later.
 import { countsForDepth } from '../domain/depth';
+import { toDetails } from '../domain/details';
 import { normalize, rankByQuery } from '../domain/search';
 
 const ENDPOINT = 'https://graphql.anilist.co';
@@ -64,6 +66,30 @@ function toEntry(media) {
   };
 }
 
+const DETAILS_QUERY = `
+query ($id: Int) {
+  Media(id: $id, type: ANIME) {
+    id
+    description(asHtml: false)
+    genres
+    tags { name isMediaSpoiler }
+    episodes
+    duration
+    season
+    seasonYear
+    status
+    source
+    averageScore
+    meanScore
+    studios(isMain: true) { nodes { name } }
+    bannerImage
+    trailer { id site }
+    siteUrl
+  }
+}`;
+const DETAILS_KEY = 'otaku-diary:details:v1:';
+const DETAILS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
 async function request(query, variables, signal) {
   const response = await fetch(ENDPOINT, {
     method: 'POST',
@@ -125,6 +151,34 @@ async function searchLive(key, signal) {
   return results;
 }
 
+// Details are fetched only when a title is opened, then kept in memory for
+// the visit and in storage for a week: AniList allows few requests a minute.
+const detailsCache = new Map();
+
+function readDetailsCache(id) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(DETAILS_KEY + id));
+    if (cached && Date.now() - cached.at < DETAILS_MAX_AGE_MS) return cached.details;
+  } catch {
+    // Unreadable cache: fetch again.
+  }
+  return null;
+}
+
+async function fetchDetails(id, signal) {
+  const cached = readDetailsCache(id);
+  if (cached) return cached;
+  const data = await request(DETAILS_QUERY, { id }, signal);
+  if (!data?.Media) throw new Error('작품 정보를 찾지 못했어요.');
+  const details = toDetails(data.Media);
+  try {
+    localStorage.setItem(DETAILS_KEY + id, JSON.stringify({ at: Date.now(), details }));
+  } catch {
+    // No storage: it stays in memory for this visit.
+  }
+  return details;
+}
+
 export const animeRepository = {
   // Call ahead of the first search so one-letter queries answer at once.
   warmUp() {
@@ -153,5 +207,13 @@ export const animeRepository = {
       0,
       MAX_RESULTS,
     );
+  },
+
+  // Synopsis, genres, trailer and the rest for one anime id.
+  async getDetails(id, { signal } = {}) {
+    if (detailsCache.has(id)) return detailsCache.get(id);
+    const details = await fetchDetails(id, signal);
+    detailsCache.set(id, details);
+    return details;
   },
 };

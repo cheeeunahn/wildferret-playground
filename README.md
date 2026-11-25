@@ -110,6 +110,11 @@ them without changing the screens.
 from the browser (credited in the UI). The 200 most popular titles are fetched
 once and cached for a week, so a search returns results from its first letter.
 The nickname and the recorded anime live in the visitor's `localStorage`.
+Tapping a title on the bookshelf opens its details: AniList's synopsis (in
+English for now), genres, non-spoiler tags, facts and, when AniList has one,
+the YouTube trailer. Details are fetched only when a title is opened and cached
+for a week; the trailer loads only when tapped, and the music pauses while it
+plays.
 
 **Art.** The character, submarine, café, sea life and backgrounds were drawn
 with Codex image generation.

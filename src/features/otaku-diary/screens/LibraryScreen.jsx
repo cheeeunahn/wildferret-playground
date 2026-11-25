@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AnimeCard from '../components/AnimeCard';
+import AnimeDetailSheet from '../components/AnimeDetailSheet';
 import ReviewSheet from '../components/ReviewSheet';
 import SoundToggle from '../components/SoundToggle';
 import { MAX_RATING } from '../domain/review';
@@ -9,14 +10,17 @@ import styles from './LibraryScreen.module.css';
 const RATING_FILTERS = [0, ...Array.from({ length: MAX_RATING }, (_, i) => MAX_RATING - i)];
 
 // The bookshelf, opened: every anime the user has recorded, newest first,
-// with its stars and comment. Each row can be re-rated, and the list can be
-// narrowed to one star rating.
+// with its stars and comment. Tapping a row opens its details (synopsis,
+// trailer, genres), each row can be re-rated, and the list can be narrowed to
+// one star rating.
 export default function LibraryScreen({ diary, onBack }) {
   const { records } = diary;
   const [editingId, setEditingId] = useState(null);
+  const [openId, setOpenId] = useState(null);
   const [ratingFilter, setRatingFilter] = useState(0);
   const shown = ratingFilter ? records.filter((r) => r.rating === ratingFilter) : records;
   const editing = records.find((r) => r.id === editingId);
+  const open = records.find((r) => r.id === openId);
 
   const saveReview = async (review) => {
     await diary.saveReview(editingId, review);
@@ -71,6 +75,7 @@ export default function LibraryScreen({ diary, onBack }) {
             <li key={anime.id}>
               <AnimeCard
                 anime={anime}
+                onOpen={() => setOpenId(anime.id)}
                 action={
                   <button
                     className={styles.rate}
@@ -88,6 +93,14 @@ export default function LibraryScreen({ diary, onBack }) {
       )}
       <p className={styles.credit}>작품 정보·이미지: AniList</p>
 
+      {open && (
+        <AnimeDetailSheet
+          key={open.id}
+          anime={open}
+          onEditReview={() => setEditingId(open.id)}
+          onClose={() => setOpenId(null)}
+        />
+      )}
       {editing && (
         <ReviewSheet
           key={editing.id}

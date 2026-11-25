@@ -1,0 +1,274 @@
+/* Covers the phone column, above every screen's own layers. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  padding-top: calc(28px + env(safe-area-inset-top));
+  background: rgb(15 30 70 / 0.45);
+  animation: fade 0.2s ease-out;
+}
+
+.sheet {
+  display: flex;
+  width: 100%;
+  max-height: 100%;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 22px 22px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 30px rgb(20 40 90 / 0.25);
+  animation: rise 0.25s ease-out;
+  outline: none;
+}
+
+/* The banner bleeds to the sheet's edges; without one it is a soft strip. */
+.hero {
+  position: relative;
+  height: 96px;
+  flex: none;
+  margin: 0 -16px;
+  background: linear-gradient(135deg, #ffe1ec, #dbe9ff);
+}
+
+.banner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.9);
+  color: #2b3350;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgb(20 40 90 / 0.2);
+  cursor: pointer;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: -48px;
+}
+
+.poster {
+  position: relative;
+  flex: none;
+  width: 76px;
+  height: 106px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(20 40 90 / 0.2);
+}
+
+.poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.titles {
+  min-width: 0;
+  padding-bottom: 2px;
+}
+
+.title {
+  margin: 0;
+  color: #2b3350;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.native {
+  margin: 2px 0 0;
+  color: #7a85a3;
+  font-size: 12px;
+}
+
+/* The user's own record, on the same light wood as the bookshelf. */
+.mine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fbf6f0;
+}
+
+.unrated {
+  color: #9a8f86;
+  font-size: 13px;
+}
+
+.edit {
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #ff6fa3;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.comment {
+  width: 100%;
+  margin: 0;
+  color: #4a5473;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.facts div {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f4f7fc;
+}
+
+.facts dt {
+  color: #8d97b3;
+  font-size: 11px;
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  color: #2b3350;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heading {
+  margin: 0;
+  color: #2b3350;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.synopsis {
+  margin: 0;
+  color: #4a5473;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.synopsis[data-folded] {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.more {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #ff5a96;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #5b6684;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chips[data-accent] li {
+  background: #ffe7f0;
+  color: #d6336c;
+}
+
+.status {
+  margin: 0;
+  padding: 16px 0;
+  color: #7a85a3;
+  font-size: 14px;
+  text-align: center;
+}
+
+.retry {
+  display: block;
+  margin: 8px auto 0;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #2b3350;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.credit {
+  margin: 0;
+  color: #a3acc4;
+  font-size: 11px;
+  text-align: right;
+}
+
+.credit a {
+  color: inherit;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
