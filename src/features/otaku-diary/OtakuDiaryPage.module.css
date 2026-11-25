@@ -2,7 +2,9 @@
 .backdrop {
   display: flex;
   justify-content: center;
-  min-height: 100dvh;
+  /* --app-height is the viewport height, held still while the keyboard is
+     up. See useLockedHeight. */
+  min-height: var(--app-height, 100dvh);
   background: radial-gradient(circle at 50% 0, #1d5a9e, #0b1f55 70%);
 }
 
@@ -10,7 +12,7 @@
   position: relative;
   width: 100%;
   max-width: 430px;
-  height: 100dvh;
+  height: var(--app-height, 100dvh);
   overflow: hidden;
   background: #f4f8fd;
   font-family:

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDiary } from './hooks/useDiary';
+import { useLockedHeight } from './hooks/useLockedHeight';
 import { useMusic } from './hooks/useSound';
 import LibraryScreen from './screens/LibraryScreen';
 import MainScreen from './screens/MainScreen';
@@ -16,6 +17,7 @@ const FADE_MS = 400;
 // Wires the diary to the screens and decides which one shows.
 export default function OtakuDiaryPage() {
   const diary = useDiary();
+  const backdropRef = useLockedHeight();
   const [screen, setScreen] = useState('title'); // title | onboarding | main | room | library
   const [firstRoomVisit, setFirstRoomVisit] = useState(false);
   const { saveProfile, reset } = diary;
@@ -62,7 +64,7 @@ export default function OtakuDiaryPage() {
   };
 
   return (
-    <div className={styles.backdrop}>
+    <div ref={backdropRef} className={styles.backdrop}>
       <main className={styles.phone}>
         {screen === 'title' && (
           <TitleScreen
