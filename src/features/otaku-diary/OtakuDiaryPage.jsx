@@ -6,6 +6,7 @@ import LibraryScreen from './screens/LibraryScreen';
 import MainScreen from './screens/MainScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import RoomScreen from './screens/RoomScreen';
+import TapRipple from './components/TapRipple';
 import TitleScreen from './screens/TitleScreen';
 import './fonts.css';
 import styles from './OtakuDiaryPage.module.css';
@@ -74,7 +75,11 @@ export default function OtakuDiaryPage() {
           <OnboardingScreen diary={diary} onFinish={finishOnboarding} />
         )}
         {screen === 'main' && (
-          <MainScreen diary={diary} onEnterSubmarine={enterSubmarine} />
+          <MainScreen
+            diary={diary}
+            onEnterSubmarine={enterSubmarine}
+            onBack={() => setScreen('title')}
+          />
         )}
         {screen === 'room' && (
           <RoomScreen
@@ -95,6 +100,7 @@ export default function OtakuDiaryPage() {
           />
         )}
         <div className={styles.fade} data-on={fading || undefined} aria-hidden="true" />
+        <TapRipple />
       </main>
     </div>
   );

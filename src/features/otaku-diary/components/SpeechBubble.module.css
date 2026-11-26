@@ -10,7 +10,6 @@
   font-weight: 700;
   line-height: 1.4;
   white-space: nowrap;
-  box-shadow: 0 6px 14px rgb(20 40 80 / 0.22);
   animation: float 1.8s ease-in-out infinite;
 }
 

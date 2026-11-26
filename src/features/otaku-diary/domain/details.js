@@ -58,6 +58,7 @@ function visibleTags(tags) {
 export function toDetails(media) {
   return {
     id: media.id,
+    nativeTitle: media.title?.native ?? null,
     description: plainText(media.description),
     genres: media.genres ?? [],
     tags: visibleTags(media.tags),

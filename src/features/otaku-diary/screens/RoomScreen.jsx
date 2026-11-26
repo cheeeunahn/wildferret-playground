@@ -79,10 +79,7 @@ export default function RoomScreen({ diary, showTour, onTourEnd, onOpenBookshelf
         <button className={styles.back} type="button" onClick={onBack}>
           ← 바다로
         </button>
-        <div className={styles.headerEnd}>
-          <span className={styles.place}>잠수함 카페</span>
-          <SoundToggle />
-        </div>
+        <SoundToggle />
       </header>
 
       <button

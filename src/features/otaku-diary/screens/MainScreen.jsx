@@ -7,8 +7,9 @@ import styles from './MainScreen.module.css';
 
 // Where the user lands after onboarding: search, rate, add, watch the
 // submarine.
-// Tapping the submarine goes inside it.
-export default function MainScreen({ diary, onEnterSubmarine }) {
+// Tapping the submarine goes inside it; the back button returns to the title
+// screen, where logging in and out live.
+export default function MainScreen({ diary, onEnterSubmarine, onBack }) {
   const { profile, records, depth } = diary;
   const [lastAdded, setLastAdded] = useState(null);
   const recordedIds = useMemo(() => new Set(records.map((r) => r.id)), [records]);
@@ -26,6 +27,9 @@ export default function MainScreen({ diary, onEnterSubmarine }) {
     <div className={styles.screen}>
       <header className={styles.header}>
         <div className={styles.titleRow}>
+          <button className={styles.back} type="button" onClick={onBack} aria-label="첫 화면으로 돌아가기">
+            ←
+          </button>
           <h1 className={styles.heading}>
             <span>{profile.nickname || '덕후'}</span>님의 애니 기록
           </h1>
@@ -45,7 +49,7 @@ export default function MainScreen({ diary, onEnterSubmarine }) {
 
       <p className={styles.progress}>
         {depth.nextLayer
-          ? `다음 층(${depth.nextLayer.name})까지 ${depth.toNextLayer}편`
+          ? `다음 층까지 ${depth.toNextLayer}편`
           : '가장 깊은 층에 도착했어요'}
       </p>
 

@@ -16,7 +16,6 @@
   border: 2px solid #ffb7d2;
   border-radius: 18px;
   background: rgb(255 255 255 / 0.93);
-  box-shadow: 0 8px 24px rgb(30 50 90 / 0.22);
   backdrop-filter: blur(6px);
   cursor: pointer;
   user-select: none;
@@ -34,7 +33,6 @@
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
 }
 
 .text {

@@ -114,6 +114,21 @@ themselves; only the repositories in `data/` do.
 from the browser (credited in the UI). The 200 most popular titles are fetched
 once and cached for a week, so a search returns results from its first letter.
 
+AniList has no Korean titles, so a query with Hangul in it goes to
+`/api/anime/search` (`worker/anime.js`) instead. The Worker asks
+[TMDB](https://www.themoviedb.org) which animation the Korean title names and
+returns each one's original title; the browser looks those up on AniList in one
+request, and the exact match is shown under its Korean title. TMDB's search
+matches whole words, so one syllable ("사") finds little: `/api/anime/popular`
+returns the ~700 most-voted Japanese animation with Korean titles, which the
+browser keeps for a week and matches by prefix, ahead of TMDB's own results.
+This needs a TMDB
+key (a v3 API key or a v4 read access token, from themoviedb.org → Settings →
+API): `TMDB_API_KEY=…` in `.dev.vars` for `pnpm dev`, and
+`pnpm wrangler secret put TMDB_API_KEY` for the deployed Worker. Without it
+Korean searches say so and English ones work as before. This product uses the
+TMDB API but is not endorsed or certified by TMDB.
+
 **The diary's backend.** The nickname and the recorded anime live in a
 Cloudflare D1 database, behind `/api/diary` (routes are listed at the top of
 `worker/diary.js`). A visitor is recognised by a random token in an HttpOnly
@@ -123,8 +138,9 @@ hash. Without an account, a diary belongs to that one browser.
 **Accounts.** The title screen leads with 로그인, then 비회원으로 시작하기
 for using the diary without an account, and a 회원가입 link. Accounts are an ID
 and a password (`worker/auth.js`); logging in or signing up goes straight into
-the diary. Signing up turns the diary already in the browser
-into the account's diary. Logging in on another device opens that diary, and an
+the diary. A new account always starts empty, with onboarding: a diary made in
+the browser without an account is not carried over, and is deleted on sign-up
+(the form says so). Logging in on another device opens that diary, and an
 anonymous diary already made on that device is merged into it. Logging out
 leaves the browser with a blank diary; the account's stays on the server.
 
@@ -153,9 +169,11 @@ once. Genre and studio are not stored with a record: they are fetched from
 AniList for the whole bookshelf, 50 titles per request, and cached in the
 browser for a week.
 
-Tapping a title on the bookshelf opens its details: AniList's synopsis (in
-English for now), genres, non-spoiler tags, facts and, when AniList has one,
-the YouTube trailer. Details are fetched only when a title is opened and cached
+Tapping a title on the bookshelf opens its details: the synopsis, genres,
+non-spoiler tags, facts and, when AniList has one, the YouTube trailer. The
+synopsis is TMDB's Korean one when `/api/anime/overview` finds the title there
+(a later season gets its series' synopsis, as TMDB keeps one per series), and
+AniList's English one otherwise. Details are fetched only when a title is opened and cached
 for a week; the trailer loads only when tapped, and the music pauses while it
 plays.
 

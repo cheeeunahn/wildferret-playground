@@ -93,8 +93,10 @@ async function startSession(db, url, session, userId, statements) {
   return created.cookie;
 }
 
-// The diary already in this browser becomes the new account's diary; with no
-// diary yet, an empty one is created.
+// A new account always starts with an empty diary and goes through
+// onboarding. A diary made in this browser without an account is not carried
+// over: nothing could reach it once the session is the account's, so it is
+// deleted here. (Logging in to an existing account merges it instead.)
 async function signup(request, env, url) {
   const db = env.DB;
   const body = await readJson(request);
@@ -110,12 +112,12 @@ async function signup(request, env, url) {
 
   const now = new Date().toISOString();
   const { hash, salt, iterations } = await hashPassword(password);
-  const statements = [];
-  let userId = session?.userId;
-  if (!userId) {
-    userId = crypto.randomUUID();
-    statements.push(db.prepare('INSERT INTO users (id, created_at) VALUES (?, ?)').bind(userId, now));
-  }
+  const userId = crypto.randomUUID();
+  const statements = [
+    db.prepare('INSERT INTO users (id, created_at) VALUES (?, ?)').bind(userId, now),
+  ];
+  // Takes the visitor's records and session with it.
+  if (session) statements.push(db.prepare('DELETE FROM users WHERE id = ?').bind(session.userId));
   statements.push(
     db
       .prepare(

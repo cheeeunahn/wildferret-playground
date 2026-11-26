@@ -23,7 +23,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, hi
           className={styles.input}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="본 애니 검색 (영어 제목)"
+          placeholder="본 애니 검색 (한국어·영어 제목)"
           aria-label="애니 검색"
           autoComplete="off"
           autoCorrect="off"
@@ -48,7 +48,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, hi
           {status === 'loading' && <p className={styles.note}>찾는 중…</p>}
           {status === 'error' && <p className={styles.note}>{error}</p>}
           {status === 'ready' && results.length === 0 && (
-            <p className={styles.note}>검색 결과가 없어요. 영어 제목으로 찾아보세요.</p>
+            <p className={styles.note}>검색 결과가 없어요. 다른 제목으로 찾아보세요.</p>
           )}
           {status === 'ready' && results.length > 0 && (
             <ul className={styles.list}>
@@ -76,7 +76,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, hi
               })}
             </ul>
           )}
-          <p className={styles.credit}>작품 정보·이미지: AniList</p>
+          <p className={styles.credit}>작품 정보·이미지: AniList · 한국어 제목: TMDB</p>
         </div>
       )}
     </div>

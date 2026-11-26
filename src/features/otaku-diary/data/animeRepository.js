@@ -2,8 +2,12 @@
 // objects: { id, title, nativeTitle, year, format, cover, color,
 // countsForDepth }, and getDetails adds the fields from domain/details.js.
 // Swap the body for our own API later.
+//
+// Korean queries take a detour: our /api/anime/search asks TMDB which anime
+// the Korean title names, and those are then looked up on AniList.
 import { countsForDepth } from '../domain/depth';
 import { toDetails } from '../domain/details';
+import { isKoreanQuery, mergeKoreanResults, toAniListSearch } from '../domain/koreanSearch';
 import { normalize, rankByQuery } from '../domain/search';
 
 const ENDPOINT = 'https://graphql.anilist.co';
@@ -70,6 +74,7 @@ const DETAILS_QUERY = `
 query ($id: Int) {
   Media(id: $id, type: ANIME) {
     id
+    title { native }
     description(asHtml: false)
     genres
     tags { name isMediaSpoiler }
@@ -87,7 +92,7 @@ query ($id: Int) {
     siteUrl
   }
 }`;
-const DETAILS_KEY = 'otaku-diary:details:v1:';
+const DETAILS_KEY = 'otaku-diary:details:v2:';
 const DETAILS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 async function request(query, variables, signal) {
@@ -151,6 +156,111 @@ async function searchLive(key, signal) {
   return results;
 }
 
+// One AniList request looks up every title TMDB named, a few anime each: a
+// series on TMDB is several seasons and films on AniList.
+const KOREAN_SEARCH = '/api/anime/search';
+const KOREAN_POPULAR = '/api/anime/popular';
+const KOREAN_POPULAR_KEY = 'otaku-diary:popular-ko:v1';
+const PER_CANDIDATE = 4;
+const MAX_CANDIDATES = 8;
+
+function candidatesQuery(count) {
+  const indexes = Array.from({ length: count }, (_, i) => i);
+  return `
+query (${indexes.map((i) => `$s${i}: String`).join(', ')}) {
+  ${indexes
+    .map(
+      (i) => `c${i}: Page(perPage: ${PER_CANDIDATE}) {
+    media(search: $s${i}, ${AIRED}) { ${MEDIA_FIELDS} }
+  }`,
+    )
+    .join('\n  ')}
+}`;
+}
+
+async function fetchCandidates(url, signal) {
+  const response = await fetch(url, { headers: { accept: 'application/json' }, signal });
+  const body = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(body?.error ?? '검색에 실패했어요. 잠시 후 다시 시도해 주세요.');
+  }
+  return body?.results ?? [];
+}
+
+// TMDB's search matches whole words too, so "사" finds almost nothing. The
+// best-known anime with Korean titles are fetched once, kept for a week, and
+// matched here by prefix, like the AniList list above.
+function toKoreanEntries(candidates) {
+  return candidates.map((candidate) => ({
+    anime: candidate,
+    names: [normalize(candidate.koreanTitle)],
+  }));
+}
+
+async function fetchKoreanPopular() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(KOREAN_POPULAR_KEY));
+    if (cached && Date.now() - cached.at < POPULAR_MAX_AGE_MS) {
+      return toKoreanEntries(cached.candidates);
+    }
+  } catch {
+    // Unreadable cache: fetch again.
+  }
+  const candidates = await fetchCandidates(KOREAN_POPULAR);
+  try {
+    localStorage.setItem(KOREAN_POPULAR_KEY, JSON.stringify({ at: Date.now(), candidates }));
+  } catch {
+    // No storage: it stays in memory for this visit.
+  }
+  return toKoreanEntries(candidates);
+}
+
+// One shared load, forgotten on failure, as with `loadPopular`.
+let koreanPopular = null;
+function loadKoreanPopular() {
+  koreanPopular ??= fetchKoreanPopular().catch(() => {
+    koreanPopular = null;
+    return [];
+  });
+  return koreanPopular;
+}
+
+// Well-known titles that start with the query come first, then whatever
+// TMDB's own search adds.
+async function koreanCandidates(key, signal) {
+  const fromPopular = rankByQuery(await loadKoreanPopular(), key, MAX_CANDIDATES);
+  if (key.length < LIVE_MIN_LENGTH) return fromPopular;
+
+  let fromLive;
+  try {
+    fromLive = await fetchCandidates(`${KOREAN_SEARCH}?q=${encodeURIComponent(key)}`, signal);
+  } catch (error) {
+    if (error.name === 'AbortError' || fromPopular.length === 0) throw error;
+    fromLive = [];
+  }
+  const seen = new Set(fromPopular.map((candidate) => candidate.originalTitle));
+  return [
+    ...fromPopular,
+    ...fromLive.filter((candidate) => !seen.has(candidate.originalTitle)),
+  ].slice(0, MAX_CANDIDATES);
+}
+
+async function searchKorean(key, signal) {
+  if (liveCache.has(key)) return liveCache.get(key);
+  const candidates = await koreanCandidates(key, signal);
+  let results = [];
+  if (candidates.length > 0) {
+    const variables = Object.fromEntries(
+      candidates.map((candidate, i) => [`s${i}`, toAniListSearch(candidate.originalTitle)]),
+    );
+    const data = await request(candidatesQuery(candidates.length), variables, signal);
+    const matches = candidates.map((_, i) => (data?.[`c${i}`]?.media ?? []).map(toAnime));
+    results = mergeKoreanResults(candidates, matches, MAX_RESULTS);
+  }
+  liveCache.set(key, results);
+  return results;
+}
+
 // Genre and studio for many titles at once, for the bookshelf's filters:
 // one request covers up to 50 ids. Kept in storage for a week, under one key.
 const FACETS_QUERY = `
@@ -210,17 +320,54 @@ async function fetchDetails(id, signal) {
   return details;
 }
 
+// AniList's synopses are English. TMDB's Korean one is asked for through our
+// Worker, by the native title, and kept for a week under its own key: "TMDB
+// has none" is remembered too, but a failed request is not, so the next visit
+// asks again. Returns null when there is none to show.
+const KOREAN_OVERVIEW = '/api/anime/overview';
+const OVERVIEW_KEY = 'otaku-diary:overview-ko:v1:';
+
+async function fetchKoreanOverview(id, nativeTitle, signal) {
+  if (!nativeTitle) return null;
+  try {
+    const cached = JSON.parse(localStorage.getItem(OVERVIEW_KEY + id));
+    if (cached && Date.now() - cached.at < DETAILS_MAX_AGE_MS) return cached.overview;
+  } catch {
+    // Unreadable cache: fetch again.
+  }
+  let overview;
+  try {
+    const response = await fetch(`${KOREAN_OVERVIEW}?title=${encodeURIComponent(nativeTitle)}`, {
+      headers: { accept: 'application/json' },
+      signal,
+    });
+    if (!response.ok) return null;
+    overview = (await response.json()).overview ?? null;
+  } catch (error) {
+    if (error.name === 'AbortError') throw error;
+    return null;
+  }
+  try {
+    localStorage.setItem(OVERVIEW_KEY + id, JSON.stringify({ at: Date.now(), overview }));
+  } catch {
+    // No storage: it stays in memory for this visit.
+  }
+  return overview;
+}
+
 export const animeRepository = {
   // Call ahead of the first search so one-letter queries answer at once.
   warmUp() {
     loadPopular();
+    loadKoreanPopular();
   },
 
   // Popular titles that start with the query come first, then whatever
-  // AniList's own search adds.
+  // AniList's own search adds. A Korean query is answered through TMDB.
   async search(query, { signal } = {}) {
     const key = query.trim().toLowerCase();
     if (!key) return [];
+    if (isKoreanQuery(key)) return searchKorean(key, signal);
 
     const fromPopular = rankByQuery(await loadPopular(), key);
     if (key.length < LIVE_MIN_LENGTH) return fromPopular;
@@ -269,10 +416,17 @@ export const animeRepository = {
     return Object.fromEntries(ids.map((id) => [id, cache[id]]));
   },
 
-  // Synopsis, genres, trailer and the rest for one anime id.
+  // Synopsis, genres, trailer and the rest for one anime id. The synopsis is
+  // TMDB's Korean one when it has it (`descriptionLang: 'ko'`), else AniList's.
   async getDetails(id, { signal } = {}) {
     if (detailsCache.has(id)) return detailsCache.get(id);
-    const details = await fetchDetails(id, signal);
+    const fromAniList = await fetchDetails(id, signal);
+    const overview = await fetchKoreanOverview(id, fromAniList.nativeTitle, signal);
+    const details = {
+      ...fromAniList,
+      description: overview ?? fromAniList.description,
+      descriptionLang: overview ? 'ko' : 'en',
+    };
     detailsCache.set(id, details);
     return details;
   },

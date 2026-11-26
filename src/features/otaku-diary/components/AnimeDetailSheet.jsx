@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { factsOf } from '../domain/details';
+import { genreLabel } from '../domain/format';
+import { tagLabel } from '../domain/tags';
 import { useAnimeDetails } from '../hooks/useAnimeDetails';
 import { Poster } from './AnimeCard';
 import Stars from './Stars';
@@ -11,7 +13,8 @@ const FOLD_AT = 280;
 
 // Bottom sheet with everything about one recorded anime: the user's own
 // stars and comment, then AniList's facts, trailer, synopsis, genres and
-// tags. The synopsis is AniList's English text for now.
+// tags. The synopsis is TMDB's Korean text when there is one, else AniList's
+// English.
 export default function AnimeDetailSheet({ anime, onEditReview, onClose }) {
   const { status, details, retry } = useAnimeDetails(anime.id);
   const closeRef = useRef(null);
@@ -76,6 +79,7 @@ export default function AnimeDetailSheet({ anime, onEditReview, onClose }) {
           <a href={details?.siteUrl ?? `https://anilist.co/anime/${anime.id}`} target="_blank" rel="noreferrer">
             AniList ↗
           </a>
+          {details?.descriptionLang === 'ko' && ' · 줄거리: TMDB'}
         </p>
       </section>
     </div>
@@ -105,19 +109,19 @@ function Details({ details, title }) {
 
       {details.description && (
         <Section heading="줄거리">
-          <Synopsis text={details.description} />
+          <Synopsis text={details.description} lang={details.descriptionLang} />
         </Section>
       )}
 
       {details.genres.length > 0 && (
         <Section heading="장르">
-          <Chips items={details.genres} accent />
+          <Chips items={details.genres.map(genreLabel)} accent />
         </Section>
       )}
 
       {details.tags.length > 0 && (
         <Section heading="태그">
-          <Chips items={details.tags} />
+          <Chips items={details.tags.map(tagLabel)} />
         </Section>
       )}
     </>
@@ -133,12 +137,12 @@ function Section({ heading, children }) {
   );
 }
 
-function Synopsis({ text }) {
+function Synopsis({ text, lang }) {
   const long = text.length > FOLD_AT;
   const [open, setOpen] = useState(!long);
   return (
     <>
-      <p className={styles.synopsis} lang="en" data-folded={!open || undefined}>
+      <p className={styles.synopsis} lang={lang} data-folded={!open || undefined}>
         {text}
       </p>
       {long && (

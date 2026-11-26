@@ -9,7 +9,8 @@
   position: absolute;
   inset: 0;
   /* The depth readout sits under the sound button. */
-  --readout-top: calc(56px + env(safe-area-inset-top));
+  /* The sound button ends at 56px; 10px of air below it. */
+  --readout-top: calc(66px + env(safe-area-inset-top));
 }
 
 /* Top right, as on every other screen. */

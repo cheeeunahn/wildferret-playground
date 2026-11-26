@@ -181,20 +181,6 @@ button.sub:active img {
   transform: translateX(-50%);
 }
 
-.count {
-  position: absolute;
-  left: 50%;
-  bottom: -6px;
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.92);
-  color: #ff5a96;
-  font-size: 13px;
-  font-weight: 800;
-  transform: translateX(-50%);
-  box-shadow: 0 3px 8px rgb(10 40 80 / 0.25);
-}
-
 .cargo {
   position: absolute;
   top: 2%;
@@ -210,7 +196,6 @@ button.sub:active img {
   border: 2px solid #fff;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 6px 14px rgb(10 40 80 / 0.3);
 }
 
 .cargoPoster img {
@@ -230,25 +215,65 @@ button.sub:active img {
   animation: bubble 5s ease-in infinite;
 }
 
+/* Two copies of the depth readout, one per background. Each layer covers
+   the scene and is clipped to its side of the waterline, moving with it. */
+.readoutLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: clip-path var(--dive);
+}
+
+.readoutLayer[data-over='sky'] {
+  clip-path: inset(0 0 calc(100% - max(var(--waterline), 0px)) 0);
+  color: #2b3350;
+}
+
+.readoutLayer[data-over='sea'] {
+  clip-path: inset(max(var(--waterline), 0px) 0 0 0);
+  color: #fff;
+}
+
+/* No box: a small label over a large number, like a gauge reading. */
 .readout {
   position: absolute;
   top: var(--readout-top, 10px);
-  right: 12px;
-  z-index: 5;
+  right: 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 6px 12px;
-  border-radius: 12px;
-  background: rgb(255 255 255 / 0.85);
-  color: #2b3350;
-  font-size: 12px;
-  line-height: 1.35;
+  margin: 0;
+  line-height: 1;
+}
+
+.readout span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  opacity: 0.75;
 }
 
 .readout strong {
-  font-size: 17px;
+  margin-top: 3px;
+  font-size: 30px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.readout small {
+  margin-left: 2px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* How many titles got the submarine this deep. */
+.readout em {
+  margin-top: 6px;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
 }
 
 @keyframes dip {

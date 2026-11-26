@@ -69,18 +69,15 @@
   font-size: 19px;
   font-weight: 800;
   letter-spacing: 0.06em;
-  box-shadow:
-    0 5px 0 #d83f7b,
-    0 12px 24px rgb(10 50 110 / 0.35);
+  /* A hard lower edge, so the button reads as pressable; no soft shadow. */
+  box-shadow: 0 5px 0 #d83f7b;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 .cta:active {
   transform: translateY(3px);
-  box-shadow:
-    0 2px 0 #d83f7b,
-    0 8px 16px rgb(10 50 110 / 0.3);
+  box-shadow: 0 2px 0 #d83f7b;
 }
 
 /* The quieter second button: carry on without an account. */

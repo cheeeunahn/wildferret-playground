@@ -149,7 +149,7 @@ export default function AccountSheet({ diary, initialMode = 'login', onSuccess, 
 
         <p className={styles.note}>
           {signingUp
-            ? `${hasDiary ? '지금까지 기록한 애니는 새 계정으로 옮겨져요. ' : ''}이메일을 받지 않아서 비밀번호를 잊으면 되찾을 수 없어요. 꼭 기억해 두세요.`
+            ? `${hasDiary ? '새 계정은 빈 기록으로 시작해요. 비회원으로 기록한 애니는 옮겨지지 않고 지워져요. ' : ''}이메일을 받지 않아서 비밀번호를 잊으면 되찾을 수 없어요. 꼭 기억해 두세요.`
             : hasDiary
               ? '이 기기에서 기록한 애니는 로그인한 계정의 기록에 합쳐져요.'
               : '로그인하면 계정에 기록해 둔 애니를 불러와요.'}

@@ -5,7 +5,7 @@
 // anime id to `{ genres, studio }` from AniList, and may be missing ids that
 // have not loaded: those records simply have no genre or studio yet.
 
-import { formatLabel } from './format';
+import { formatLabel, genreLabel } from './format';
 
 export const NO_FILTER = { rating: 0, genre: '', studio: '', format: '' };
 
@@ -38,7 +38,10 @@ function tally(values, labelOf = (value) => value) {
 // The choices each dropdown offers: only what is on this bookshelf.
 export function filterOptions(records, facets) {
   return {
-    genres: tally(records.flatMap((record) => facets[record.id]?.genres ?? [])),
+    genres: tally(
+      records.flatMap((record) => facets[record.id]?.genres ?? []),
+      genreLabel,
+    ),
     studios: tally(records.map((record) => facets[record.id]?.studio)),
     formats: tally(
       records.map((record) => record.format),

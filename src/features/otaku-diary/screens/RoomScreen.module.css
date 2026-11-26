@@ -23,14 +23,7 @@
   justify-content: space-between;
 }
 
-.headerEnd {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.back,
-.place {
+.back {
   padding: 8px 14px;
   border: 0;
   border-radius: 999px;
@@ -38,15 +31,7 @@
   color: #2b3350;
   font-size: 14px;
   font-weight: 700;
-  box-shadow: 0 3px 10px rgb(60 40 30 / 0.18);
-}
-
-.back {
   cursor: pointer;
-}
-
-.place {
-  color: #ff5a96;
 }
 
 .bookshelf {
@@ -85,7 +70,6 @@
   font-weight: 800;
   white-space: nowrap;
   translate: -50% 0;
-  box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
   /* `transform` for the bounce, because `translate` centres the tag. */
   animation: point 1s ease-in-out infinite;
 }

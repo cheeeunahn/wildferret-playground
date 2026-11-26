@@ -32,9 +32,9 @@ export default function PrivacyPage() {
         ))}
 
         <section className={styles.section}>
-          <h2>10. 문의처</h2>
+          <h2>{SECTIONS.length + 1}. 개인정보 보호책임자와 문의처</h2>
           <p>
-            운영자: {OPERATOR}
+            개인정보 보호책임자: 운영자 {OPERATOR}
             <br />
             이메일: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
           </p>
