@@ -290,10 +290,8 @@ built with `wrangler preview`; that is why `wrangler.jsonc` has
 `"preview_urls": true` and an empty `"previews": {}` block. Preview links are
 behind Cloudflare Access sign-in.
 
-Cloudflare's bot comments on a pull request once but does not update that
-comment on later pushes, so `.github/workflows/preview-link.yml` keeps a
-"Preview" comment current: it waits for the Workers Builds check on each new
-commit and updates the comment with the result and the branch's link.
+Cloudflare's bot comments on each pull request with the preview link and
+keeps that comment current on every push, listing each commit's deployment.
 
 Every pull request is also reviewed by Claude Code
 (`.github/workflows/claude-code-review.yml`), which needs a
