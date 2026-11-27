@@ -7,6 +7,7 @@
 //   PATCH  /api/diary/profile                 { nickname?, onboarded?, visitedRoom? }
 //   POST   /api/diary/records                 { anime, review }
 //   PUT    /api/diary/records/:animeId/review { rating, comment }
+//   DELETE /api/diary/records                 { animeIds: [1, 2] }
 //   POST   /api/diary/import                  { profile, records } from localStorage
 //
 // A visitor gets a user row and a session cookie on their first write, not
@@ -22,6 +23,8 @@ const MAX_NICKNAME_LENGTH = 12;
 const MAX_TITLE_LENGTH = 300;
 const MAX_RECORDS = 2000;
 const IMPORT_CHUNK = 50;
+// D1 allows 100 bound values in a statement.
+const REMOVE_CHUNK = 90;
 const FORMATS = new Set(['TV', 'TV_SHORT', 'MOVIE', 'SPECIAL', 'OVA', 'ONA', 'MUSIC']);
 
 const EMPTY = { profile: { nickname: '', onboarded: false, visitedRoom: false }, records: [] };
@@ -166,6 +169,33 @@ async function saveReview(db, userId, animeId, body) {
   if (result.meta.changes === 0) throw new HttpError(404, '기록을 찾지 못했어요.');
 }
 
+function parseAnimeIds(body) {
+  const ids = body.animeIds;
+  const valid =
+    Array.isArray(ids) &&
+    ids.length > 0 &&
+    ids.length <= MAX_RECORDS &&
+    ids.every((id) => Number.isInteger(id) && id > 0 && id < 1e9);
+  if (!valid) throw new HttpError(400, '지울 기록이 올바르지 않아요.');
+  return [...new Set(ids)];
+}
+
+// Removing a record that is already gone is not an error: the diary the
+// answer carries is what the user asked for either way. All of them go in
+// one transaction, so a failure does not leave half the selection behind.
+async function removeRecords(db, userId, animeIds) {
+  const statements = [];
+  for (let i = 0; i < animeIds.length; i += REMOVE_CHUNK) {
+    const chunk = animeIds.slice(i, i + REMOVE_CHUNK);
+    statements.push(
+      db
+        .prepare(`DELETE FROM records WHERE user_id = ? AND anime_id IN (${chunk.map(() => '?').join(', ')})`)
+        .bind(userId, ...chunk),
+    );
+  }
+  await db.batch(statements);
+}
+
 // Brings over a diary kept in localStorage. Records already on the server
 // win, and the profile is only taken while the server one is still blank, so
 // sending the same diary twice changes nothing.
@@ -208,6 +238,7 @@ function route(method, path) {
   if (path === '/import' && method === 'POST') return { name: 'import' };
   const review = /^\/records\/(\d{1,9})\/review$/.exec(path);
   if (review && method === 'PUT') return { name: 'review', animeId: Number(review[1]) };
+  if (path === '/records' && method === 'DELETE') return { name: 'remove' };
   return null;
 }
 
@@ -228,6 +259,10 @@ export async function handleDiary(request, env, url) {
   assertSameOrigin(request, url);
   // Parse before creating anyone, so a malformed request leaves no user row.
   const body = await readJson(request);
+  // Parsed first, for the same reason. A visitor who has recorded nothing
+  // has nothing to remove, and gets no user row for asking.
+  const removing = matched.name === 'remove' ? parseAnimeIds(body) : null;
+  if (removing && !userId) return respond();
   if (!userId) {
     userId = crypto.randomUUID();
     const created = await newSession(url, db, userId);
@@ -241,6 +276,7 @@ export async function handleDiary(request, env, url) {
   if (matched.name === 'profile') await saveProfile(db, userId, body);
   if (matched.name === 'add') await addRecord(db, userId, body);
   if (matched.name === 'review') await saveReview(db, userId, matched.animeId, body);
+  if (removing) await removeRecords(db, userId, removing);
   if (matched.name === 'import') await importDiary(db, userId, body);
   return respond();
 }

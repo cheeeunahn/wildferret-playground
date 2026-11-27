@@ -261,19 +261,21 @@ async function searchKorean(key, signal) {
   return results;
 }
 
-// Genre and studio for many titles at once, for the bookshelf's filters:
+// Genre, studio and AniList's title for many titles at once, for the
+// bookshelf's filters and its English titles:
 // one request covers up to 50 ids. Kept in storage for a week, under one key.
 const FACETS_QUERY = `
 query ($ids: [Int]) {
   Page(perPage: 50) {
     media(id_in: $ids, type: ANIME) {
       id
+      title { english romaji native }
       genres
       studios(isMain: true) { nodes { name } }
     }
   }
 }`;
-const FACETS_KEY = 'otaku-diary:facets:v1';
+const FACETS_KEY = 'otaku-diary:facets:v2';
 const FACETS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const FACETS_PER_REQUEST = 50;
 
@@ -387,7 +389,8 @@ export const animeRepository = {
     );
   },
 
-  // `{ [id]: { genres, studio } }` for the given anime ids. Ids AniList does
+  // `{ [id]: { title, genres, studio } }` for the given anime ids; `title`
+  // is AniList's own, for showing a record in English. Ids AniList does
   // not return are remembered as having neither, so they are not asked for
   // again on every visit.
   async getFacets(ids, { signal } = {}) {
@@ -401,6 +404,7 @@ export const animeRepository = {
         const media = found.get(id);
         cache[id] = {
           at: Date.now(),
+          title: media ? media.title.english || media.title.romaji || media.title.native : null,
           genres: media?.genres ?? [],
           studio: media?.studios?.nodes?.[0]?.name ?? null,
         };
@@ -426,6 +430,8 @@ export const animeRepository = {
       ...fromAniList,
       description: overview ?? fromAniList.description,
       descriptionLang: overview ? 'ko' : 'en',
+      // AniList's English synopsis, for when English is asked for.
+      englishDescription: fromAniList.description,
     };
     detailsCache.set(id, details);
     return details;

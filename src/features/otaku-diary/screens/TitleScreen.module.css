@@ -2,7 +2,7 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(#9fdcff 0 38%, #5fcdea 38%, #1f86c9) center / cover;
+  background: linear-gradient(var(--od-secondary-container) 0 38%, var(--od-secondary-bright) 38%, var(--od-secondary)) center / cover;
 }
 
 /* She stands a little higher than the drawing's centre, so her face stays
@@ -34,9 +34,9 @@
 
 .title {
   margin: 0;
-  color: #fff;
-  font-size: 29px;
-  font-weight: 800;
+  color: var(--od-white);
+  font-size: var(--od-text-display);
+  font-weight: var(--od-weight-heavy);
   line-height: 1.3;
   letter-spacing: -0.01em;
   word-break: keep-all;
@@ -45,9 +45,9 @@
 
 .tagline {
   margin: 10px 0 0;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
+  color: var(--od-white);
+  font-size: var(--od-text-body-l);
+  font-weight: var(--od-weight-bold);
   text-shadow: 0 1px 8px rgb(10 50 110 / 0.7);
 }
 
@@ -58,58 +58,41 @@
   margin-top: 26px;
 }
 
-/* The main button: 로그인, or 기록하기 once logged in. */
-.cta {
-  width: 100%;
-  height: 58px;
-  border: 0;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ff8fb8, #ff5a96);
-  color: #fff;
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  /* A hard lower edge, so the button reads as pressable; no soft shadow. */
-  box-shadow: 0 5px 0 #d83f7b;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.cta:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #d83f7b;
-}
-
-/* The quieter second button: carry on without an account. */
+/* The screen's two buttons are the largest in the app. The main one, 로그인
+   (or 기록하기 once logged in), has a hard lower edge so it reads as
+   pressable over the picture. */
+.cta,
 .guest {
   width: 100%;
-  height: 52px;
-  border: 2px solid rgb(255 255 255 / 0.9);
-  border-radius: 999px;
+  height: 56px;
+  font-weight: var(--od-weight-heavy);
+}
+
+.cta {
+  font-size: var(--od-text-title-m);
+  letter-spacing: 0.06em;
+  box-shadow: 0 5px 0 var(--od-primary-strong);
+}
+
+.cta:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--od-primary-strong);
+}
+
+/* The quieter second button, carry on without an account: glass over the
+   water rather than a white box. */
+.guest {
+  border-color: var(--od-white);
   background: rgb(255 255 255 / 0.16);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
+  color: var(--od-white);
   backdrop-filter: blur(4px);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.guest:active {
-  background: rgb(255 255 255 / 0.28);
-}
-
-.cta:disabled,
-.guest:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 
 .account {
   min-height: 20px;
   margin: 2px 0 0;
-  color: #fff;
-  font-size: 13px;
+  color: var(--od-white);
+  font-size: var(--od-text-body-s);
   line-height: 20px;
   text-shadow: 0 1px 6px rgb(10 50 110 / 0.7);
 }
@@ -120,7 +103,7 @@
   background: none;
   color: inherit;
   font: inherit;
-  font-weight: 700;
+  font-weight: var(--od-weight-bold);
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -136,6 +119,6 @@
   margin-top: auto;
   padding-top: 12px;
   color: rgb(255 255 255 / 0.8);
-  font-size: 11px;
+  font-size: var(--od-text-label-s);
   text-underline-offset: 3px;
 }

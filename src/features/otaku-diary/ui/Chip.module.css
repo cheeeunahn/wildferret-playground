@@ -1,0 +1,55 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--od-space-1);
+  padding: 5px var(--od-space-3);
+  border: var(--od-hairline) solid transparent;
+  border-radius: var(--od-radius-full);
+  background: var(--od-surface-container);
+  color: var(--od-on-surface-variant);
+  font-family: inherit;
+  font-size: var(--od-text-label-m);
+  font-weight: var(--od-weight-bold);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.chip[data-accent] {
+  background: var(--od-primary-container);
+  color: var(--od-on-primary-container);
+}
+
+/* A filter. */
+button.chip {
+  height: var(--od-control-s);
+  padding: 0 var(--od-space-3);
+  border-color: var(--od-outline, var(--od-outline-variant));
+  background: var(--od-surface);
+  color: var(--od-on-surface-muted);
+  font-size: var(--od-text-body-s);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.chip[data-grow] {
+  flex: 1;
+  padding: 0;
+}
+
+button.chip[aria-pressed='true'] {
+  border-color: var(--od-primary);
+  background: var(--od-primary);
+  color: var(--od-on-primary);
+}
+
+button.chip[data-accent] {
+  border-color: transparent;
+  background: var(--od-primary-container);
+  color: var(--od-on-primary-container);
+}
+
+button.chip:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

@@ -38,6 +38,7 @@ export const GENRE_LABEL = {
   Thriller: '스릴러',
 };
 
-export function genreLabel(genre) {
-  return GENRE_LABEL[genre] ?? genre;
+// AniList's genre names are English; `language` 'en' keeps them.
+export function genreLabel(genre, language = 'ko') {
+  return language === 'en' ? genre : (GENRE_LABEL[genre] ?? genre);
 }

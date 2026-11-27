@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { youtubeEmbedUrl, youtubeWatchUrl } from '../domain/details';
 import { useMusicHold } from '../hooks/useSound';
+import Icon from '../ui/Icon';
 import styles from './Trailer.module.css';
 
 // A YouTube trailer, shown as its thumbnail until tapped so nothing loads
@@ -31,13 +32,13 @@ export default function Trailer({ trailer, title }) {
           >
             <img src={trailer.thumbnail} alt="" loading="lazy" />
             <span className={styles.play} aria-hidden="true">
-              ▶
+              <Icon name="play" />
             </span>
           </button>
         )}
       </div>
       <a className={styles.link} href={youtubeWatchUrl(trailer.youtubeId)} target="_blank" rel="noreferrer">
-        YouTube에서 보기 ↗
+        YouTube에서 보기 <Icon name="external" />
       </a>
     </div>
   );

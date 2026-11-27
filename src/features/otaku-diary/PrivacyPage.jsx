@@ -1,5 +1,7 @@
 import { CONTACT_EMAIL, EFFECTIVE_DATE, OPERATOR, SECTIONS } from './domain/privacy';
 import './fonts.css';
+import './tokens.css';
+import Icon from './ui/Icon';
 import styles from './PrivacyPage.module.css';
 
 // The privacy policy, at /otaku-diary/privacy. The text lives in
@@ -9,7 +11,7 @@ export default function PrivacyPage() {
     <div className={styles.backdrop}>
       <main className={styles.page}>
         <a className={styles.back} href="/otaku-diary">
-          ← 애니와 함께하는 바다모험
+          <Icon name="back" /> 애니와 함께하는 바다모험
         </a>
         <h1 className={styles.title}>개인정보 처리방침</h1>
         <p className={styles.lead}>

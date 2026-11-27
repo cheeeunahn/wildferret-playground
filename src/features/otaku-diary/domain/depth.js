@@ -9,15 +9,19 @@ export function countsForDepth(format) {
 }
 
 // `from` is the first count inside the layer; `top`/`bottom` are metres.
+// Every title is 50m, so a layer starts at the count that reaches its top.
+export const METRES_PER_TITLE = 50;
+
 export const LAYERS = [
   { id: 'surface', name: '표층', from: 0, top: 0, bottom: 200 },
-  { id: 'twilight', name: '중층', from: 10, top: 200, bottom: 1000 },
-  { id: 'midnight', name: '심해층', from: 50, top: 1000, bottom: 4000 },
-  { id: 'abyss', name: '심연층', from: 200, top: 4000, bottom: 6000 },
-  { id: 'hadal', name: '초심해층', from: 500, top: 6000, bottom: 11000 },
+  { id: 'twilight', name: '중층', from: 4, top: 200, bottom: 1000 },
+  { id: 'midnight', name: '심해층', from: 20, top: 1000, bottom: 4000 },
+  { id: 'abyss', name: '심연층', from: 80, top: 4000, bottom: 6000 },
+  { id: 'hadal', name: '초심해층', from: 120, top: 6000, bottom: 11000 },
 ];
 
-const SURFACE_PER_TITLE = 22;
+// The trench bottom: 220 titles reach it, and more stay there.
+const BOTTOM = LAYERS[LAYERS.length - 1].bottom;
 
 function layerIndexFor(count) {
   let index = 0;
@@ -27,19 +31,8 @@ function layerIndexFor(count) {
   return index;
 }
 
-function metresFor(count, index) {
-  const layer = LAYERS[index];
-  const next = LAYERS[index + 1];
-  if (!next) {
-    // The trench has no next layer: approach the bottom without reaching it.
-    const span = layer.bottom - layer.top;
-    return layer.top + span * (1 - Math.exp(-(count - layer.from) / 500));
-  }
-  // The surface layer is a flat 22m per title: 9 titles reach 198m, and the
-  // tenth crosses into the next layer at 200m.
-  const perTitle =
-    index === 0 ? SURFACE_PER_TITLE : (layer.bottom - layer.top) / (next.from - layer.from);
-  return layer.top + (count - layer.from) * perTitle;
+function metresFor(count) {
+  return Math.min(count * METRES_PER_TITLE, BOTTOM);
 }
 
 export function depthFor(count) {
@@ -48,7 +41,7 @@ export function depthFor(count) {
   const nextLayer = LAYERS[layerIndex + 1] ?? null;
   return {
     count,
-    metres: Math.round(metresFor(count, layerIndex)),
+    metres: metresFor(count),
     layer,
     layerIndex,
     nextLayer,

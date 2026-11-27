@@ -1,0 +1,40 @@
+.bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--od-space-2);
+  height: calc(52px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) var(--od-space-2) 0;
+  background: var(--od-surface-glass);
+  backdrop-filter: blur(8px);
+}
+
+.bar:where([data-overlay]) {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 5;
+}
+
+/* Both sides are the same width, so the title stays in the middle whatever
+   they hold. */
+.side {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.side[data-end] {
+  justify-content: flex-end;
+}
+
+.title {
+  flex: none;
+  max-width: 60%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-title-m);
+  font-weight: var(--od-weight-heavy);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

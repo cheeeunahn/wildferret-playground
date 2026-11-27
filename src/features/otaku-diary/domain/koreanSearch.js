@@ -99,7 +99,8 @@ export function pickOverview(results, nativeTitle) {
 // once: every candidate's best match in the candidates' order, then every
 // second match, and so on, so "사" lists many titles rather than every season
 // of the first. The anime TMDB actually meant gets its Korean title; the
-// sequels and films AniList lists beside it keep their own.
+// sequels and films AniList lists beside it keep their own. A renamed anime
+// keeps AniList's title as `aniListTitle`, for showing it in English.
 export function mergeKoreanResults(candidates, matches, limit) {
   // A Map keeps the order anime were first found in. A film often turns up
   // first beside its series and only later as the candidate it matches, so a
@@ -114,7 +115,7 @@ export function mergeKoreanResults(candidates, matches, limit) {
         candidate.koreanTitle &&
         (sameTitle(anime.nativeTitle, candidate.originalTitle) ||
           sameTitle(anime.nativeTitle, toAniListSearch(candidate.originalTitle)));
-      if (exact) merged.set(anime.id, { ...anime, title: candidate.koreanTitle });
+      if (exact) merged.set(anime.id, { ...anime, title: candidate.koreanTitle, aniListTitle: anime.title });
       else if (!merged.has(anime.id)) merged.set(anime.id, anime);
     });
   }

@@ -13,9 +13,9 @@
 .box {
   position: relative;
   padding: 26px 18px 22px;
-  border: 2px solid #ffb7d2;
-  border-radius: 18px;
-  background: rgb(255 255 255 / 0.93);
+  border: 2px solid var(--od-primary-outline);
+  border-radius: var(--od-radius-m);
+  background: var(--od-surface-glass);
   backdrop-filter: blur(6px);
   cursor: pointer;
   user-select: none;
@@ -27,20 +27,20 @@
   top: -15px;
   left: 16px;
   padding: 4px 16px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ff8fb8, #ff6fa3);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
+  border-radius: var(--od-radius-full);
+  background: var(--od-primary);
+  color: var(--od-white);
+  font-size: var(--od-text-body-m);
+  font-weight: var(--od-weight-bold);
   letter-spacing: 0.04em;
 }
 
 .text {
   position: relative;
   margin: 0;
-  color: #2b3350;
-  font-size: 17px;
-  font-weight: 400;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-title-m);
+  font-weight: var(--od-weight-regular);
   line-height: 1.6;
   word-break: keep-all;
 }
@@ -58,8 +58,9 @@
   position: absolute;
   right: 16px;
   bottom: 8px;
-  color: #ff6fa3;
-  font-size: 12px;
+  color: var(--od-primary);
+  font-size: var(--od-text-title-l);
+  line-height: 1;
   animation: nudge 1s ease-in-out infinite;
 }
 

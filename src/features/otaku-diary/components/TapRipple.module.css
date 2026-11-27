@@ -41,7 +41,7 @@
 .ring {
   width: 72px;
   height: 72px;
-  border: 3px solid #fff;
+  border: 3px solid var(--od-white);
   box-shadow:
     0 0 8px rgb(90 200 255 / 0.9),
     inset 0 0 8px rgb(90 200 255 / 0.7);
@@ -65,10 +65,58 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--od-surface);
   box-shadow: 0 0 6px rgb(90 200 255 / 0.95);
   rotate: calc(var(--turn) + var(--i) * 72deg);
   animation: spark 0.55s ease-out forwards;
+}
+
+/* The trail behind a dragging finger: dots of light that shrink away, close
+   enough together to read as one ribbon. */
+.trail {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--od-white) 0 30%, rgb(140 220 255 / 0.6) 55%, rgb(140 220 255 / 0) 75%);
+  will-change: transform, opacity;
+  animation: trail 0.45s ease-out forwards;
+}
+
+/* Now and then one drifts off to the side (--dx, --dy) as a spark. */
+.trailSpark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--od-white);
+  box-shadow: 0 0 6px rgb(255 190 220 / 0.95);
+  will-change: transform, opacity;
+  animation: trailSpark 0.6s ease-out forwards;
+}
+
+@keyframes trail {
+  from {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes trailSpark {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, 0)) scale(0.3);
+  }
 }
 
 @keyframes glow {

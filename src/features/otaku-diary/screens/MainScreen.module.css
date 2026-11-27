@@ -3,7 +3,9 @@
   height: 100%;
   flex-direction: column;
   overflow-y: auto;
-  background: #f4f8fd;
+  /* Outlined buttons here are framed in sky blue. */
+  --od-outline: var(--od-secondary-outline);
+  background: var(--od-surface-dim);
 }
 
 .header {
@@ -11,7 +13,7 @@
   top: 0;
   z-index: 20;
   padding: calc(14px + env(safe-area-inset-top)) 14px 12px;
-  background: linear-gradient(#9fdcff, #c9ecff);
+  background: linear-gradient(var(--od-secondary-container), var(--od-secondary-container-soft));
 }
 
 .titleRow {
@@ -22,53 +24,21 @@
   margin-bottom: 10px;
 }
 
-.back {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border: 2px solid #bfe3f5;
-  border-radius: 50%;
-  background: #fff;
-  color: #2b3350;
-  font-size: 18px;
-  cursor: pointer;
-}
-
 .heading {
-  /* Takes the room between the back button and the sound toggle. */
+  /* Takes the room beside the settings button. */
   flex: 1;
   min-width: 0;
-  margin: 0 0 0 2px;
-  color: #2b3350;
-  font-size: 18px;
-  font-weight: 800;
+  margin: 0;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-title-m);
+  font-weight: var(--od-weight-heavy);
 }
 
 .heading span {
-  color: #ff5a96;
+  color: var(--od-primary);
 }
 
 .sea {
   flex: 1;
   min-height: 300px;
-}
-
-.progress {
-  margin: 0;
-  padding: 10px 16px;
-  background: #1f86c9;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 16px calc(6px + env(safe-area-inset-bottom));
-  background: #1f86c9;
-  color: rgb(255 255 255 / 0.7);
-  font-size: 11px;
 }

@@ -22,7 +22,7 @@
   z-index: 1;
 }
 .layer[data-layer='far'] .body {
-  fill: color-mix(in srgb, var(--sea-top) 55%, #fff);
+  fill: color-mix(in srgb, var(--sea-top) 55%, var(--od-white));
 }
 .layer[data-layer='far'] .crest {
   stroke: rgb(255 255 255 / 0.5);

@@ -50,6 +50,10 @@ export function useDiary() {
     async (animeId, review) => setDiary(await diaryRepository.saveReview(animeId, review)),
     [],
   );
+  const removeAnime = useCallback(
+    async (animeIds) => setDiary(await diaryRepository.removeRecords(animeIds)),
+    [],
+  );
   // These reject with a message for the user when the server says no.
   const signup = useCallback(
     async (loginId, password, ageConfirmed) =>
@@ -84,5 +88,6 @@ export function useDiary() {
     saveProfile,
     addAnime,
     saveReview,
+    removeAnime, // takes a list of ids
   };
 }

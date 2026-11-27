@@ -1,0 +1,64 @@
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: var(--od-z-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--od-space-5);
+  background: var(--od-scrim);
+  animation: fade var(--od-motion-fast) ease-out;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 320px;
+  padding: 22px 18px var(--od-space-4);
+  border-radius: var(--od-radius-m);
+  background: var(--od-surface);
+  text-align: center;
+  animation: pop var(--od-motion) ease-out;
+}
+
+.title {
+  margin: 0 0 var(--od-space-2);
+  color: var(--od-on-surface);
+  font-size: var(--od-text-title-m);
+  font-weight: var(--od-weight-heavy);
+}
+
+.body {
+  margin-bottom: var(--od-space-4);
+  color: var(--od-on-surface-variant);
+  font-size: var(--od-text-body-s);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.body p {
+  margin: 0;
+}
+
+.body b {
+  color: var(--od-on-surface);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim,
+  .dialog {
+    animation: none;
+  }
+}

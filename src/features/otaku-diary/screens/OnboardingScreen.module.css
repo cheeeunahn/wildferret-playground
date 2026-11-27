@@ -2,7 +2,7 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(#9fdcff, #e3f6ff 55%, #5fcdea) center / cover;
+  background: linear-gradient(var(--od-secondary-container), var(--od-secondary-container-soft) 55%, var(--od-secondary-bright)) center / cover;
 }
 
 .sea {

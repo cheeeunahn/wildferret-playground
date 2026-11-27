@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { assetUrl } from '../assets';
 import AccountSheet from '../components/AccountSheet';
-import DeleteAccountSheet from '../components/DeleteAccountSheet';
 import { PRIVACY_PATH } from '../domain/privacy';
 import { GUIDE_NAME } from '../domain/onboarding';
+import Button from '../ui/Button';
 import styles from './TitleScreen.module.css';
 
 // The way in. A visitor picks 로그인 (the main button), 비회원으로 시작하기
@@ -12,20 +12,6 @@ import styles from './TitleScreen.module.css';
 // could not be loaded, and the button retries instead.
 export default function TitleScreen({ onStart, disabled, error, onRetry, diary }) {
   const [accountMode, setAccountMode] = useState(null); // null | login | signup
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-  const logout = async () => {
-    setLoggingOut(true);
-    try {
-      await diary.logout();
-    } finally {
-      setLoggingOut(false);
-    }
-  };
-
-  // Logging in or signing up from here goes straight into the diary. It
-  // waits for the render that has the account's diary, so `onStart` picks
-  // the right screen for it.
   const [enterWhenLoggedIn, setEnterWhenLoggedIn] = useState(false);
   useEffect(() => {
     if (enterWhenLoggedIn && diary.loginId) {
@@ -59,38 +45,26 @@ export default function TitleScreen({ onStart, disabled, error, onRetry, diary }
 
         <div className={styles.actions}>
           {error ? (
-            <button className={styles.cta} type="button" onClick={onRetry}>
+            <Button className={styles.cta} size="l" onClick={onRetry}>
               다시 시도
-            </button>
+            </Button>
           ) : diary.loginId ? (
             <>
-              <button className={styles.cta} type="button" onClick={onStart} disabled={disabled}>
+              <Button className={styles.cta} size="l" onClick={onStart} disabled={disabled}>
                 기록하기
-              </button>
+              </Button>
               <p className={styles.account}>
-                <b>{diary.loginId}</b> 님으로 로그인했어요 ·{' '}
-                <button className={styles.link} type="button" onClick={logout} disabled={loggingOut}>
-                  로그아웃
-                </button>{' '}
-                ·{' '}
-                <button className={styles.link} type="button" onClick={() => setDeleteOpen(true)}>
-                  계정 삭제
-                </button>
+                <b>{diary.loginId}</b> 님으로 로그인했어요
               </p>
             </>
           ) : (
             <>
-              <button
-                className={styles.cta}
-                type="button"
-                onClick={() => setAccountMode('login')}
-                disabled={disabled}
-              >
+              <Button className={styles.cta} size="l" onClick={() => setAccountMode('login')} disabled={disabled}>
                 로그인
-              </button>
-              <button className={styles.guest} type="button" onClick={onStart} disabled={disabled}>
+              </Button>
+              <Button className={styles.guest} variant="outlined" size="l" onClick={onStart} disabled={disabled}>
                 {guestLabel}
-              </button>
+              </Button>
               <p className={styles.account}>
                 계정이 없나요?{' '}
                 <button
@@ -119,7 +93,6 @@ export default function TitleScreen({ onStart, disabled, error, onRetry, diary }
           onClose={() => setAccountMode(null)}
         />
       )}
-      {deleteOpen && <DeleteAccountSheet diary={diary} onClose={() => setDeleteOpen(false)} />}
     </div>
   );
 }

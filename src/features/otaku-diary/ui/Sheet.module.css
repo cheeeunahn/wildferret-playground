@@ -1,0 +1,62 @@
+/* States and variants are written inside :where(), so every rule here weighs
+   one class and no more. A class the caller passes in then wins, as long as
+   the caller's styles load after these: import ui/ components before the
+   module's own stylesheet. */
+
+/* Covers the phone column, above every screen's own layers. The space kept
+   at the top means a tall sheet never hides that there is a screen behind. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: var(--od-z-sheet);
+  display: flex;
+  align-items: flex-end;
+  padding-top: calc(28px + env(safe-area-inset-top));
+  background: var(--od-scrim);
+  animation: fade var(--od-motion) ease-out;
+}
+
+.sheet {
+  display: flex;
+  width: 100%;
+  max-height: 100%;
+  flex-direction: column;
+  gap: var(--od-space-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px var(--od-gutter) calc(var(--od-space-4) + env(safe-area-inset-bottom));
+  border-radius: var(--od-radius-l) var(--od-radius-l) 0 0;
+  background: var(--od-surface);
+  outline: none;
+  text-align: left;
+  animation: rise 0.25s ease-out;
+}
+
+.sheet:where([data-flush]) {
+  padding-top: 0;
+}
+
+.actions {
+  display: flex;
+  gap: var(--od-space-2);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim,
+  .sheet {
+    animation: none;
+  }
+}

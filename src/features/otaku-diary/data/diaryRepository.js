@@ -91,6 +91,12 @@ export const diaryRepository = {
     return inOrder(() => call('PUT', `/records/${animeId}/review`, normalizeReview(review)));
   },
 
+  // Takes titles off the bookshelf, with their ratings and comments, all in
+  // one request.
+  removeRecords(animeIds) {
+    return inOrder(() => call('DELETE', '/records', { animeIds }));
+  },
+
   // The account calls below change who the browser is, then resolve to the
   // diary it now has.
 

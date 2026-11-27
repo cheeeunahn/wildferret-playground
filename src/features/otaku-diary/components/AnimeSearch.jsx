@@ -1,6 +1,11 @@
 import { useState } from 'react';
+import { titleIn } from '../domain/language';
 import { useAnimeSearch } from '../hooks/useAnimeSearch';
+import { useLanguage } from '../hooks/useLanguage';
 import AnimeCard from './AnimeCard';
+import Chip from '../ui/Chip';
+import Icon from '../ui/Icon';
+import IconButton from '../ui/IconButton';
 import styles from './AnimeSearch.module.css';
 
 // Search bar with a results panel under it. `recordedIds` marks titles the
@@ -8,7 +13,12 @@ import styles from './AnimeSearch.module.css';
 // bar glow on and off until the user starts typing.
 export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, highlight = false }) {
   const [query, setQuery] = useState('');
-  const { status, results, error } = useAnimeSearch(query);
+  const found = useAnimeSearch(query);
+  const { status, error } = found;
+  // With English chosen, a title found by its Korean name is listed, and
+  // recorded, under AniList's.
+  const { language } = useLanguage();
+  const results = found.results.map((anime) => titleIn(language, anime, anime.aniListTitle));
 
   const pick = (anime) => {
     setQuery('');
@@ -18,7 +28,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, hi
   return (
     <div className={styles.search}>
       <label className={styles.bar} data-highlight={(highlight && !query) || undefined}>
-        <span className={styles.icon} aria-hidden="true">🔍</span>
+        <Icon name="search" className={styles.icon} />
         <input
           className={styles.input}
           value={query}
@@ -32,14 +42,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, hi
           enterKeyHint="search"
         />
         {query && (
-          <button
-            className={styles.clear}
-            type="button"
-            onClick={() => setQuery('')}
-            aria-label="검색어 지우기"
-          >
-            ✕
-          </button>
+          <IconButton icon="close" label="검색어 지우기" variant="tonal" size="s" onClick={() => setQuery('')} />
         )}
       </label>
 
@@ -65,9 +68,7 @@ export default function AnimeSearch({ onPick, recordedIds, autoFocus = false, hi
                       <AnimeCard
                         anime={anime}
                         action={
-                          <span className={styles.add} data-recorded={recorded || undefined}>
-                            {recorded ? '기록됨' : '+ 기록'}
-                          </span>
+                          <Chip accent={!recorded}>{recorded ? '기록됨' : '+ 기록'}</Chip>
                         }
                       />
                     </button>

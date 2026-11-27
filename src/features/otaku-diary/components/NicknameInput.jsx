@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import Button from '../ui/Button';
+import TextField from '../ui/TextField';
 import styles from './NicknameInput.module.css';
 
 const MAX_LENGTH = 12;
@@ -15,8 +17,7 @@ export default function NicknameInput({ onSubmit }) {
         if (ready) onSubmit(value);
       }}
     >
-      <input
-        className={styles.input}
+      <TextField
         value={value}
         onChange={(e) => setValue(e.target.value)}
         maxLength={MAX_LENGTH}
@@ -26,9 +27,9 @@ export default function NicknameInput({ onSubmit }) {
         autoFocus
         enterKeyHint="done"
       />
-      <button className={styles.button} type="submit" disabled={!ready}>
+      <Button size="l" type="submit" disabled={!ready}>
         확인
-      </button>
+      </Button>
     </form>
   );
 }

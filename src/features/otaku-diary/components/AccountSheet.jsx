@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { PRIVACY_PATH } from '../domain/privacy';
+import Button from '../ui/Button';
+import Message from '../ui/Message';
+import SegmentedControl from '../ui/SegmentedControl';
+import Sheet, { SheetActions } from '../ui/Sheet';
+import TextField from '../ui/TextField';
 import styles from './AccountSheet.module.css';
+
+const MODES = [
+  { value: 'login', label: '로그인' },
+  { value: 'signup', label: '회원가입' },
+];
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -59,127 +69,85 @@ export default function AccountSheet({ diary, initialMode = 'login', onSuccess, 
   };
 
   return (
-    <div className={styles.backdrop} onClick={busy ? undefined : onClose}>
-      <form
-        className={styles.sheet}
-        role="dialog"
-        aria-modal="true"
-        aria-label={signingUp ? '회원가입' : '로그인'}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.key === 'Escape' && !busy && onClose()}
-        onSubmit={submit}
-      >
-        <div className={styles.tabs} role="tablist">
-          {[
-            ['login', '로그인'],
-            ['signup', '회원가입'],
-          ].map(([value, label]) => (
-            <button
-              key={value}
-              className={styles.tab}
-              type="button"
-              role="tab"
-              aria-selected={mode === value}
-              onClick={() => switchTo(value)}
-              disabled={busy}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+    <Sheet label={signingUp ? '회원가입' : '로그인'} onClose={onClose} busy={busy} onSubmit={submit}>
+      <SegmentedControl options={MODES} value={mode} onChange={switchTo} disabled={busy} grow aria-label="로그인 또는 회원가입" />
 
-        <label className={styles.field}>
-          <span className={styles.label}>아이디</span>
+      <TextField
+        label="아이디"
+        hint={signingUp && '영문 소문자, 숫자, 밑줄(_) 4~20자'}
+        ref={idRef}
+        value={loginId}
+        onChange={(e) => setLoginId(e.target.value)}
+        autoComplete="username"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        maxLength={20}
+        disabled={busy}
+      />
+      <TextField
+        label="비밀번호"
+        hint={signingUp && `${MIN_PASSWORD_LENGTH}자 이상`}
+        ref={passwordRef}
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        autoComplete={signingUp ? 'new-password' : 'current-password'}
+        maxLength={128}
+        disabled={busy}
+      />
+      {signingUp && (
+        <TextField
+          label="비밀번호 확인"
+          type="password"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          autoComplete="new-password"
+          maxLength={128}
+          disabled={busy}
+        />
+      )}
+
+      {signingUp && (
+        <label className={styles.check}>
           <input
-            ref={idRef}
-            className={styles.input}
-            value={loginId}
-            onChange={(e) => setLoginId(e.target.value)}
-            autoComplete="username"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            maxLength={20}
+            type="checkbox"
+            checked={ageConfirmed}
+            onChange={(e) => setAgeConfirmed(e.target.checked)}
             disabled={busy}
           />
-          {signingUp && <span className={styles.rule}>영문 소문자, 숫자, 밑줄(_) 4~20자</span>}
+          <span>만 14세 이상입니다</span>
         </label>
+      )}
 
-        <label className={styles.field}>
-          <span className={styles.label}>비밀번호</span>
-          <input
-            ref={passwordRef}
-            className={styles.input}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={signingUp ? 'new-password' : 'current-password'}
-            maxLength={128}
-            disabled={busy}
-          />
-          {signingUp && <span className={styles.rule}>{MIN_PASSWORD_LENGTH}자 이상</span>}
-        </label>
-
+      <Message>
+        {signingUp
+          ? `${hasDiary ? '새 계정은 빈 기록으로 시작해요. 비회원으로 기록한 애니는 옮겨지지 않고 지워져요. ' : ''}이메일을 받지 않아서 비밀번호를 잊으면 되찾을 수 없어요. 꼭 기억해 두세요.`
+          : hasDiary
+            ? '이 기기에서 기록한 애니는 로그인한 계정의 기록에 합쳐져요.'
+            : '로그인하면 계정에 기록해 둔 애니를 불러와요.'}
         {signingUp && (
-          <label className={styles.field}>
-            <span className={styles.label}>비밀번호 확인</span>
-            <input
-              className={styles.input}
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              autoComplete="new-password"
-              maxLength={128}
-              disabled={busy}
-            />
-          </label>
+          <>
+            {' '}
+            아이디와 비밀번호를 어떻게 다루는지는{' '}
+            <a href={PRIVACY_PATH} target="_blank" rel="noreferrer">
+              개인정보 처리방침
+            </a>
+            에서 볼 수 있어요.
+          </>
         )}
+      </Message>
 
-        {signingUp && (
-          <label className={styles.check}>
-            <input
-              type="checkbox"
-              checked={ageConfirmed}
-              onChange={(e) => setAgeConfirmed(e.target.checked)}
-              disabled={busy}
-            />
-            <span>만 14세 이상입니다</span>
-          </label>
-        )}
+      {error && <Message tone="error">{error}</Message>}
 
-        <p className={styles.note}>
-          {signingUp
-            ? `${hasDiary ? '새 계정은 빈 기록으로 시작해요. 비회원으로 기록한 애니는 옮겨지지 않고 지워져요. ' : ''}이메일을 받지 않아서 비밀번호를 잊으면 되찾을 수 없어요. 꼭 기억해 두세요.`
-            : hasDiary
-              ? '이 기기에서 기록한 애니는 로그인한 계정의 기록에 합쳐져요.'
-              : '로그인하면 계정에 기록해 둔 애니를 불러와요.'}
-          {signingUp && (
-            <>
-              {' '}
-              아이디와 비밀번호를 어떻게 다루는지는{' '}
-              <a href={PRIVACY_PATH} target="_blank" rel="noreferrer">
-                개인정보 처리방침
-              </a>
-              에서 볼 수 있어요.
-            </>
-          )}
-        </p>
-
-        {error && (
-          <p className={styles.error} role="alert">
-            {error}
-          </p>
-        )}
-
-        <div className={styles.buttons}>
-          <button className={styles.cancel} type="button" onClick={onClose} disabled={busy}>
-            취소
-          </button>
-          <button className={styles.submit} type="submit" disabled={!ready || busy}>
-            {busy ? '잠시만요…' : signingUp ? '계정 만들기' : '로그인'}
-          </button>
-        </div>
-      </form>
-    </div>
+      <SheetActions>
+        <Button variant="tonal" size="l" onClick={onClose} disabled={busy}>
+          취소
+        </Button>
+        <Button size="l" grow type="submit" disabled={!ready || busy}>
+          {busy ? '잠시만요…' : signingUp ? '계정 만들기' : '로그인'}
+        </Button>
+      </SheetActions>
+    </Sheet>
   );
 }

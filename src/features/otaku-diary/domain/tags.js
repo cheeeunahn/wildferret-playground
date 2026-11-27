@@ -369,6 +369,7 @@ export const TAG_LABEL = {
   Zombie: '좀비',
 };
 
-export function tagLabel(tag) {
-  return TAG_LABEL[tag] ?? tag;
+// AniList's tag names are English; `language` 'en' keeps them.
+export function tagLabel(tag, language = 'ko') {
+  return language === 'en' ? tag : (TAG_LABEL[tag] ?? tag);
 }

@@ -3,7 +3,9 @@
   height: 100%;
   flex-direction: column;
   overflow-y: auto;
-  background: #fbf6f0;
+  /* Outlined buttons and chips here are framed in wood. */
+  --od-outline: var(--od-tertiary-outline);
+  background: var(--od-tertiary-surface);
 }
 
 .header {
@@ -14,129 +16,103 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: calc(14px + env(safe-area-inset-top)) 14px 12px;
-  background: rgb(251 246 240 / 0.94);
+  /* The top bar inside keeps clear of the notch itself. */
+  padding: 0 14px 12px;
+  background: var(--od-tertiary-surface-glass);
   backdrop-filter: blur(6px);
 }
 
-.back {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #e6d3bd;
-  border-radius: 50%;
-  background: #fff;
-  color: #2b3350;
-  font-size: 18px;
-  cursor: pointer;
+/* The bar runs the header's full width and shows the header's paper. */
+.bar {
+  width: calc(100% + 28px);
+  margin: 0 -14px;
+  /* 선택 lines up with the filters' right edge. */
+  padding-right: 14px;
+  background: none;
+  backdrop-filter: none;
 }
 
-.sound {
+.count {
+  margin-left: var(--od-space-1);
+  color: var(--od-primary);
+  font-size: var(--od-text-body-l);
+}
+
+/* Under the bar: 필터, the order, and grid or list. */
+.controls {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--od-space-2);
+}
+
+.filterButton[data-on] {
+  border-color: var(--od-primary);
+  background: var(--od-primary-container);
+  color: var(--od-on-primary-container);
+}
+
+/* How many filter values are on. */
+.badge {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  margin-left: 2px;
+  padding: 0 5px;
+  border-radius: var(--od-radius-full);
+  background: var(--od-primary);
+  color: var(--od-on-primary);
+  font-size: var(--od-text-label-s);
+}
+
+.views {
+  display: flex;
+  gap: var(--od-space-1);
   margin-left: auto;
 }
 
-.heading {
-  margin: 0;
-  color: #2b3350;
-  font-size: 19px;
-  font-weight: 800;
+.views [aria-pressed='true'] {
+  border-color: var(--od-primary);
+  background: var(--od-primary);
+  color: var(--od-on-primary);
 }
 
-.heading span {
-  margin-left: 4px;
-  color: #ff5a96;
-  font-size: 15px;
-}
-
-/* A second header row: one chip per star rating. */
-.filters {
+/* What is filtered, each removable, under the controls. */
+.applied {
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
 }
 
-.filter {
-  flex: 1;
-  height: 34px;
-  padding: 0;
-  border: 1px solid #e6d3bd;
-  border-radius: 999px;
-  background: #fff;
-  color: #8a7c70;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+.remove {
+  margin-left: 2px;
+  opacity: 0.7;
 }
 
-.filter span {
-  color: #ffb400;
+.clearAll {
+  margin-left: auto;
+  padding-right: 0;
 }
 
-.filter[aria-pressed='true'] {
-  background: #ff6fa3;
-  color: #fff;
+/* "12편 중 3편", above the titles while a filter is on. */
+.summary {
+  margin: 0;
+  padding: var(--od-space-1) 18px 0;
+  color: var(--od-on-tertiary-variant);
+  font-size: var(--od-text-label-m);
 }
 
-.filter[aria-pressed='true'] span {
-  color: #fff;
-}
-
-/* The dropdown filters share the row style of the star chips. The arrow is
-   drawn here because the native one is hidden with the native look. */
-.select {
-  flex: 1;
-  min-width: 0;
-  height: 34px;
-  padding: 0 24px 0 12px;
-  border: 1px solid #e6d3bd;
-  border-radius: 999px;
-  background: #fff
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238a7c70' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    no-repeat right 10px center / 9px;
-  color: #8a7c70;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  appearance: none;
-  cursor: pointer;
-}
-
-.select[data-on] {
-  background-color: #ffe7f0;
-  color: #d6336c;
-}
-
-.select:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-/* "12편 중 3편", above the first row while a filter is on. */
-.list .summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: #8a7c70;
-  font-size: 12px;
-  box-shadow: none;
-}
-
-.clear {
-  padding: 4px 0;
-  border: 0;
-  background: none;
-  color: #ff5a96;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
+/* Three posters across, like books face out on a shelf. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px var(--od-space-3);
+  margin: 0;
+  padding: var(--od-space-2) 14px var(--od-space-4);
+  list-style: none;
 }
 
 .list {
@@ -151,43 +127,41 @@
 /* Each row sits on a light-wood plank, like a book on a shelf. */
 .list li {
   padding: 8px 12px;
-  border-bottom: 4px solid #e6d3bd;
-  border-radius: 14px;
-  background: #fff;
+  border-bottom: 4px solid var(--od-tertiary-outline);
+  border-radius: var(--od-radius-m);
+  background: var(--od-surface);
 }
 
-.rate {
-  flex: none;
-  align-self: flex-start;
-  margin-top: 4px;
-  padding: 6px 12px;
-  border: 0;
-  border-radius: 999px;
-  background: #f3ece4;
-  color: #8a7c70;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
+.list li:has([aria-pressed='true']) {
+  background: var(--od-primary-container);
 }
 
-.rate[data-unrated] {
-  background: #ff6fa3;
-  color: #fff;
+/* Stays at the foot of the screen while rows are being ticked. */
+.toolbar {
+  position: sticky;
+  bottom: 0;
+  /* At the foot of the screen even when the shelf is short. */
+  margin-top: auto;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--od-tertiary-outline);
+  background: var(--od-tertiary-surface-glass);
+  backdrop-filter: blur(6px);
+}
+
+/* Plain words, as in a phone's edit bar, rather than underlined links. */
+.toolbarButton {
+  font-size: var(--od-text-body-l);
+  text-decoration: none;
 }
 
 .empty {
   margin: auto;
   padding: 24px;
-  color: #9a8f86;
-  font-size: 15px;
+  color: var(--od-on-tertiary-variant);
+  font-size: var(--od-text-body-l);
   line-height: 1.7;
   text-align: center;
-}
-
-.credit {
-  margin: auto 0 0;
-  padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
-  color: #b9aea4;
-  font-size: 11px;
-  text-align: right;
 }

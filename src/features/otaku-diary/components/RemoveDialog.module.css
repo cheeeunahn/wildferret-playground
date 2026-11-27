@@ -1,0 +1,5 @@
+.error {
+  margin-top: var(--od-space-2);
+  color: var(--od-error);
+  font-weight: var(--od-weight-bold);
+}
