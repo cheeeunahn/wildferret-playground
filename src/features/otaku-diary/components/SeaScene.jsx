@@ -61,7 +61,6 @@ export default function SeaScene({ depth, cargo, onSubmarineClick, nudge, childr
   const hull = (
     <span key={count} className={styles.hull} data-dive={count !== openedAt || undefined}>
       <Submarine />
-      {count > 0 && <span className={styles.count}>{count}편</span>}
       {count !== openedAt &&
         BURST.map((bubble, i) => (
           <span key={i} className={styles.burst} style={bubble} />
@@ -126,10 +125,26 @@ export default function SeaScene({ depth, cargo, onSubmarineClick, nudge, childr
         </div>
       )}
 
-      <div className={styles.readout}>
-        <strong>수심 {depth.metres.toLocaleString()}m</strong>
-        <span>{depth.layer.name}</span>
-      </div>
+      {/* The depth, as plain text on the scene. It is drawn twice, dark for
+          the sky and white for the water, each cut off at the waterline, so
+          it stays readable wherever the surface is. */}
+      {['sky', 'sea'].map((over) => (
+        <div
+          key={over}
+          className={styles.readoutLayer}
+          data-over={over}
+          aria-hidden={over === 'sea' || undefined}
+        >
+          <p className={styles.readout}>
+            <span>수심</span>
+            <strong>
+              {depth.metres.toLocaleString()}
+              <small>m</small>
+            </strong>
+            {count > 0 && <em>{count}편 기록</em>}
+          </p>
+        </div>
+      ))}
       {children}
     </div>
   );

@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:migrate": "wrangler d1 migrations apply DB --remote",
+    "db:migrate:preview": "wrangler d1 migrations apply DB --remote --config wrangler.preview-db.jsonc"
   },
   "dependencies": {
     "@mantine/core": "^9.6.1",

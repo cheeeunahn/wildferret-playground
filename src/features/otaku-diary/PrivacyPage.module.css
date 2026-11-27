@@ -1,0 +1,71 @@
+/* Same phone-sized column as the diary, but a plain page that scrolls. */
+.backdrop {
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  background: radial-gradient(circle at 50% 0, var(--od-secondary-deep), var(--od-backdrop) 70%);
+}
+
+.page {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
+  background: var(--od-tertiary-surface);
+  color: var(--od-on-surface-variant);
+  font-family:
+    NanumSquareRound, -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  font-size: var(--od-text-body-m);
+  line-height: 1.7;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.back {
+  color: var(--od-primary);
+  font-size: var(--od-text-body-s);
+  font-weight: var(--od-weight-bold);
+  text-decoration: none;
+}
+
+.title {
+  margin: 16px 0 6px;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-title-l);
+  font-weight: var(--od-weight-heavy);
+}
+
+.lead {
+  margin: 0 0 8px;
+}
+
+.section h2 {
+  margin: 22px 0 6px;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-body-l);
+  font-weight: var(--od-weight-heavy);
+}
+
+.section p {
+  margin: 0 0 6px;
+}
+
+.section ul {
+  margin: 0 0 6px;
+  padding-left: 18px;
+}
+
+.section li {
+  margin-bottom: 4px;
+}
+
+.section a {
+  color: var(--od-primary);
+}
+
+.date {
+  margin: 26px 0 0;
+  color: var(--od-on-tertiary-variant);
+  font-size: var(--od-text-label-m);
+}

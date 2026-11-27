@@ -1,0 +1,94 @@
+/* States and variants are written inside :where(), so every rule here weighs
+   one class and no more. A class the caller passes in then wins, as long as
+   the caller's styles load after these: import ui/ components before the
+   module's own stylesheet. */
+
+.button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--od-space-1);
+  border: var(--od-border) solid transparent;
+  border-radius: var(--od-radius-full);
+  background: none;
+  font-family: inherit;
+  font-weight: var(--od-weight-bold);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:where([data-grow]) {
+  flex: 1;
+  min-width: 0;
+}
+
+.button:where(:disabled) {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---- sizes ---- */
+
+.button:where([data-size='s']) {
+  height: var(--od-control-s);
+  padding: 0 var(--od-space-3);
+  font-size: var(--od-text-body-s);
+}
+
+.button:where([data-size='m']) {
+  height: 44px;
+  padding: 0 var(--od-space-4);
+  font-size: var(--od-text-body-m);
+}
+
+.button:where([data-size='l']) {
+  height: var(--od-control-l);
+  padding: 0 20px;
+  font-size: var(--od-text-title-s);
+}
+
+/* ---- variants ---- */
+
+.button:where([data-variant='filled']) {
+  background: var(--od-primary);
+  color: var(--od-on-primary);
+}
+
+.button:where([data-variant='tonal']) {
+  background: var(--od-surface-container);
+  color: var(--od-on-surface-muted);
+}
+
+.button:where([data-variant='outlined']) {
+  border-color: var(--od-outline, var(--od-outline-variant));
+  background: var(--od-surface);
+  color: var(--od-on-surface);
+}
+
+.button:where([data-variant='danger']) {
+  background: var(--od-error);
+  color: var(--od-on-error);
+}
+
+.button:where([data-variant='text']),
+.button:where([data-variant='dangerText']) {
+  height: auto;
+  padding: var(--od-space-2);
+  border: 0;
+  border-radius: var(--od-radius-xs);
+  color: var(--od-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.button:where([data-variant='dangerText']) {
+  color: var(--od-error);
+}
+
+/* Pressed: a step darker, without moving. */
+.button:where(:active:not(:disabled)) {
+  filter: brightness(0.94);
+}

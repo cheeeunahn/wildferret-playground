@@ -1,0 +1,42 @@
+.group {
+  display: inline-flex;
+  flex: none;
+  gap: var(--od-space-1);
+  padding: var(--od-space-1);
+  border-radius: var(--od-radius-full);
+  background: var(--od-surface-container);
+}
+
+.group[data-grow] {
+  display: flex;
+  flex: auto;
+}
+
+.group button {
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--od-radius-full);
+  background: none;
+  color: var(--od-on-surface-muted);
+  font-family: inherit;
+  font-size: var(--od-text-body-s);
+  font-weight: var(--od-weight-bold);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.group[data-grow] button {
+  flex: 1;
+  height: 38px;
+  font-size: var(--od-text-body-l);
+}
+
+.group button[aria-checked='true'] {
+  background: var(--od-primary);
+  color: var(--od-on-primary);
+}
+
+.group button:disabled {
+  cursor: default;
+}

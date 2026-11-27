@@ -1,4 +1,4 @@
-import { otakuDiaryPage } from './otaku-diary';
+import { otakuDiaryPage, otakuDiaryPrivacyPage } from './otaku-diary';
 import { songsFeature } from './songs';
 import { toolsFeature } from './tools';
 
@@ -13,4 +13,4 @@ export const DEFAULT_FEATURE = FEATURES[0];
 export const UNLISTED_PAGES = [];
 
 // Unlisted pages that fill the whole screen themselves: no site layout.
-export const STANDALONE_PAGES = [otakuDiaryPage];
+export const STANDALONE_PAGES = [otakuDiaryPage, otakuDiaryPrivacyPage];

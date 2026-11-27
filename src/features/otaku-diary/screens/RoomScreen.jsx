@@ -2,11 +2,11 @@ import { assetUrl } from '../assets';
 import { useEffect, useState } from 'react';
 import Character from '../components/Character';
 import DialogueBox from '../components/DialogueBox';
-import SoundToggle from '../components/SoundToggle';
 import SpeechBubble from '../components/SpeechBubble';
 import { MOODS, pickChatter } from '../domain/chatter';
 import { GUIDE_NAME, ROOM_TOUR } from '../domain/onboarding';
 import { useVoice } from '../hooks/useSound';
+import TopBar from '../ui/TopBar';
 import styles from './RoomScreen.module.css';
 
 // How long a line stays up: until its clip ends, or this long when silent.
@@ -75,15 +75,7 @@ export default function RoomScreen({ diary, showTour, onTourEnd, onOpenBookshelf
       className={styles.screen}
       style={background ? { backgroundImage: `url(${background})` } : undefined}
     >
-      <header className={styles.header}>
-        <button className={styles.back} type="button" onClick={onBack}>
-          ← 바다로
-        </button>
-        <div className={styles.headerEnd}>
-          <span className={styles.place}>잠수함 카페</span>
-          <SoundToggle />
-        </div>
-      </header>
+      <TopBar title="잠수함 카페" onBack={onBack} backLabel="바다로 돌아가기" overlay />
 
       <button
         className={styles.bookshelf}

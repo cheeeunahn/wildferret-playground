@@ -3,50 +3,20 @@
 .screen {
   --shelf-left: 0%;
   --shelf-bottom: 29%;
-  --shelf-width: 50%;
+  --shelf-width: 56%;
   --kotori-right: -2%;
   --kotori-bottom: 2%;
   /* She stands close to the viewer, in front of the counter. */
   --kotori-height: 66%;
+  /* How far her middle is from the right edge of her box: half her width,
+     and her drawing is half as wide as it is tall. In container units (cqh,
+     a hundredth of this screen's height) so her bubble can use it. */
+  --kotori-middle: calc(66cqh / 4);
+  container-type: size;
   position: relative;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(#fdf8f3, #f1e6da) center / cover;
-}
-
-.header {
-  position: absolute;
-  inset: calc(12px + env(safe-area-inset-top)) 14px auto;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.headerEnd {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.back,
-.place {
-  padding: 8px 14px;
-  border: 0;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.9);
-  color: #2b3350;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 3px 10px rgb(60 40 30 / 0.18);
-}
-
-.back {
-  cursor: pointer;
-}
-
-.place {
-  color: #ff5a96;
+  background: linear-gradient(var(--od-tertiary-surface), var(--od-tertiary-container)) center / cover;
 }
 
 .bookshelf {
@@ -78,14 +48,13 @@
   top: -26px;
   left: 50%;
   padding: 5px 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ff8fb8, #ff6fa3);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
+  border-radius: var(--od-radius-full);
+  background: var(--od-primary);
+  color: var(--od-white);
+  font-size: var(--od-text-body-s);
+  font-weight: var(--od-weight-heavy);
   white-space: nowrap;
   translate: -50% 0;
-  box-shadow: 0 3px 8px rgb(255 111 163 / 0.4);
   /* `transform` for the bounce, because `translate` centres the tag. */
   animation: point 1s ease-in-out infinite;
 }
@@ -97,7 +66,7 @@
   top: calc(100% - 1px);
   left: 50%;
   border: 7px solid transparent;
-  border-top: 9px solid #ff7fad;
+  border-top: 9px solid var(--od-primary);
   border-bottom: 0;
   translate: -50% 0;
 }
@@ -117,9 +86,9 @@
 .shelfFallback {
   display: block;
   aspect-ratio: 8 / 11;
-  border: 6px solid #fff;
-  border-radius: 10px;
-  background: repeating-linear-gradient(#e9d9c8 0 6px, #ffd3e2 6px 22%);
+  border: 6px solid var(--od-white);
+  border-radius: var(--od-radius-s);
+  background: repeating-linear-gradient(var(--od-tertiary-outline) 0 6px, var(--od-primary-outline) 6px 22%);
 }
 
 .kotori {
@@ -163,19 +132,31 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Her line, above her head. Longer than a nudge, so it wraps. */
+/* Her line, above her head. Longer than a nudge, so it wraps. She stands at
+   the screen's right edge, so a bubble centred on her would run off it: its
+   right edge is held 90px past her middle instead, or 20px inside her box
+   (about 12px inside the screen) on a small screen where she is narrower,
+   and it grows to the left. */
 .kotori .chatter {
   position: absolute;
+  right: max(calc(var(--kotori-middle) - 90px), 20px);
   bottom: 98%;
-  left: 50%;
   z-index: 2;
   width: max-content;
-  max-width: 220px;
+  max-width: min(220px, 62cqw);
   white-space: normal;
   text-align: center;
   word-break: keep-all;
-  transform: translateX(-50%);
   animation: pop 0.2s ease-out;
+}
+
+/* The tail stays over her head: 90px in from the bubble's right edge, or
+   less where the bubble could not go that far right. (The tail is 12px
+   wide, hence the 6px.) */
+.kotori .chatter::after {
+  right: calc(min(90px, var(--kotori-middle) - 20px) - 6px);
+  left: auto;
+  transform: rotate(45deg);
 }
 
 @keyframes pop {
@@ -189,6 +170,6 @@
   display: block;
   width: 90px;
   height: 100%;
-  border-radius: 45px 45px 12px 12px;
-  background: #ffb7d2;
+  border-radius: 45px 45px var(--od-radius-s) var(--od-radius-s);
+  background: var(--od-primary-outline);
 }

@@ -1,0 +1,10 @@
+/* A little larger than the letters beside it, as the drawings leave a margin
+   inside their box, and lowered to sit on the same line. */
+.icon {
+  display: inline-block;
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+  fill: currentColor;
+  vertical-align: -0.25em;
+}

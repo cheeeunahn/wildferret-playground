@@ -1,4 +1,5 @@
 import { MAX_RATING } from '../domain/review';
+import Icon from '../ui/Icon';
 import styles from './Stars.module.css';
 
 const VALUES = Array.from({ length: MAX_RATING }, (_, i) => i + 1);
@@ -13,7 +14,7 @@ export default function Stars({ rating, className }) {
     >
       {VALUES.map((value) => (
         <span key={value} data-on={value <= rating || undefined} aria-hidden="true">
-          ★
+          <Icon name="star" />
         </span>
       ))}
     </span>
@@ -36,7 +37,7 @@ export function StarInput({ value, onChange, disabled }) {
           disabled={disabled}
           onClick={() => onChange(star)}
         >
-          ★
+          <Icon name="star" />
         </button>
       ))}
     </div>

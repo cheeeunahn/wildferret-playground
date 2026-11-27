@@ -2,16 +2,37 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "wildferret-playground",
   "compatibility_date": "2026-08-14",
+  // /api/* 요청을 처리하는 Worker. 나머지는 아래 assets가 그대로 내보낸다.
+  "main": "worker/index.js",
   // 커스텀 도메인만 쓰면 미리보기 URL이 꺼진 채라, PR마다 workers.dev
   // 미리보기 링크가 생기도록 켜 둔다. 링크는 누구나 열 수 있다.
   "preview_urls": true,
   // 프리뷰 빌드는 `wrangler preview`로 돈다. 이 명령은 `previews` 블록이
-  // 있어야 실행되며, 비어 있어도 된다(설정은 위쪽 값을 그대로 쓴다).
-  "previews": {},
+  // 있어야 실행된다. 프리뷰는 운영 DB 대신 프리뷰 전용 DB 하나를 같이 쓴다.
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "wildferret-playground-preview",
+        "database_id": "9bc1ae09-5800-4bca-815d-f3cab3e14c1b"
+      }
+    ]
+  },
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    // 이게 없으면 /api/* 도 index.html로 떨어진다.
+    "run_worker_first": ["/api/*"]
   },
+  // 애니 다이어리의 DB. 테이블은 migrations/ 에 있다.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wildferret-playground",
+      "database_id": "6a40ee40-45bc-4a60-af49-dc12ba46f9a9",
+      "migrations_dir": "migrations"
+    }
+  ],
   "routes": [
     {
       "pattern": "playground.wildferret.dev",

@@ -1,13 +1,15 @@
+/* Pink while sound is on, neutral while it is off. */
 .toggle {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 2px solid #ffb7d2;
-  border-radius: 50%;
-  background: #fff;
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgb(30 50 90 / 0.15);
+  /* Wide enough for the longer label, so the button does not change size. */
+  min-width: 92px;
+  border-color: var(--od-primary-outline);
+  color: var(--od-primary);
+  font-size: var(--od-text-label-s);
+  font-weight: var(--od-weight-heavy);
+  letter-spacing: 0.04em;
+}
+
+.toggle[data-muted] {
+  border-color: var(--od-outline-variant);
+  color: var(--od-on-surface-muted);
 }

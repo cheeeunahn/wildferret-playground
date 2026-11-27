@@ -2,17 +2,19 @@
 .backdrop {
   display: flex;
   justify-content: center;
-  min-height: 100dvh;
-  background: radial-gradient(circle at 50% 0, #1d5a9e, #0b1f55 70%);
+  /* --app-height is the viewport height, held still while the keyboard is
+     up. See useLockedHeight. */
+  min-height: var(--app-height, 100dvh);
+  background: radial-gradient(circle at 50% 0, var(--od-secondary-deep), var(--od-backdrop) 70%);
 }
 
 .phone {
   position: relative;
   width: 100%;
   max-width: 430px;
-  height: 100dvh;
+  height: var(--app-height, 100dvh);
   overflow: hidden;
-  background: #f4f8fd;
+  background: var(--od-surface-dim);
   font-family:
     NanumSquareRound, -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
@@ -36,7 +38,7 @@
   position: absolute;
   inset: 0;
   z-index: 100;
-  background: #0b1f55;
+  background: var(--od-backdrop);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease-in-out;

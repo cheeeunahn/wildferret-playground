@@ -1,0 +1,156 @@
+/* Above every screen and sheet, including the fade; taps pass through. */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* A zero-size point at the tap; the parts centre themselves on it. */
+.ripple {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.glow,
+.ring,
+.ringThin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  translate: -50% -50%;
+  will-change: transform, opacity;
+}
+
+/* The halo: a soft light that swells and goes. */
+.glow {
+  width: 96px;
+  height: 96px;
+  background: radial-gradient(
+    circle,
+    rgb(255 255 255 / 0.55) 0,
+    rgb(140 220 255 / 0.3) 38%,
+    rgb(140 220 255 / 0) 70%
+  );
+  animation: glow 0.6s ease-out forwards;
+}
+
+.ring {
+  width: 72px;
+  height: 72px;
+  border: 3px solid var(--od-white);
+  box-shadow:
+    0 0 8px rgb(90 200 255 / 0.9),
+    inset 0 0 8px rgb(90 200 255 / 0.7);
+  animation: ring 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+/* A second, finer ring that starts later and travels further. */
+.ringThin {
+  width: 104px;
+  height: 104px;
+  border: 1.5px solid rgb(255 190 220 / 0.95);
+  opacity: 0;
+  animation: ring 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) 0.08s forwards;
+}
+
+/* Five sparks, 72° apart, flying out from the centre. */
+.spark {
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--od-surface);
+  box-shadow: 0 0 6px rgb(90 200 255 / 0.95);
+  rotate: calc(var(--turn) + var(--i) * 72deg);
+  animation: spark 0.55s ease-out forwards;
+}
+
+/* The trail behind a dragging finger: dots of light that shrink away, close
+   enough together to read as one ribbon. */
+.trail {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--od-white) 0 30%, rgb(140 220 255 / 0.6) 55%, rgb(140 220 255 / 0) 75%);
+  will-change: transform, opacity;
+  animation: trail 0.45s ease-out forwards;
+}
+
+/* Now and then one drifts off to the side (--dx, --dy) as a spark. */
+.trailSpark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--od-white);
+  box-shadow: 0 0 6px rgb(255 190 220 / 0.95);
+  will-change: transform, opacity;
+  animation: trailSpark 0.6s ease-out forwards;
+}
+
+@keyframes trail {
+  from {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes trailSpark {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, 0)) scale(0.3);
+  }
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes ring {
+  from {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  60% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes spark {
+  from {
+    opacity: 1;
+    transform: translateY(-8px) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-52px) scale(0.2);
+  }
+}

@@ -2,14 +2,15 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(#9fdcff, #e3f6ff 55%, #5fcdea) center / cover;
+  background: linear-gradient(var(--od-secondary-container), var(--od-secondary-container-soft) 55%, var(--od-secondary-bright)) center / cover;
 }
 
 .sea {
   position: absolute;
   inset: 0;
   /* The depth readout sits under the sound button. */
-  --readout-top: calc(56px + env(safe-area-inset-top));
+  /* The sound button ends at 56px; 10px of air below it. */
+  --readout-top: calc(66px + env(safe-area-inset-top));
 }
 
 /* Top right, as on every other screen. */

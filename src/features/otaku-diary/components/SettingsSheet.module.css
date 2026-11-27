@@ -1,0 +1,172 @@
+/* Rows sit closer together than a sheet's default spacing. */
+.sheet {
+  gap: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heading {
+  margin: 0;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-title-m);
+  font-weight: var(--od-weight-heavy);
+}
+
+.group {
+  margin: 16px 0 2px;
+  color: var(--od-on-surface-muted);
+  font-size: var(--od-text-label-m);
+  font-weight: var(--od-weight-bold);
+}
+
+.row {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--od-surface-container);
+  color: var(--od-on-surface);
+  font-size: var(--od-text-body-l);
+  font-weight: var(--od-weight-bold);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.row > span {
+  flex: none;
+  width: 104px;
+}
+
+/* The account row: the ID takes the middle, the button the end. */
+.loginId {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowEnd {
+  display: flex;
+  gap: var(--od-space-2);
+  margin-left: auto;
+}
+
+.deleteAccount {
+  align-self: flex-start;
+  margin-top: var(--od-space-2);
+  padding-left: 0;
+}
+
+/* A row's switch or choice sits at its right end. */
+.row > [role='switch'],
+.row > [role='radiogroup'] {
+  margin-left: auto;
+}
+
+/* The note under a row explains it; keep it close to that row. */
+.sheet > p {
+  margin-top: var(--od-space-2);
+}
+
+.row[data-disabled] {
+  color: var(--od-on-surface-faint);
+}
+
+a.row,
+summary.row {
+  justify-content: space-between;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rowIcon {
+  color: var(--od-on-surface-faint);
+  font-size: var(--od-text-title-m);
+  transition: transform 0.2s;
+}
+
+.credits[open] summary .rowIcon {
+  transform: rotate(180deg);
+}
+
+/* The row opens to the list of what the app uses. */
+.credits summary {
+  list-style: none;
+}
+
+.credits summary::-webkit-details-marker {
+  display: none;
+}
+
+.credits h4 {
+  margin: 14px 0 4px;
+  color: var(--od-on-surface-muted);
+  font-size: var(--od-text-label-m);
+  font-weight: var(--od-weight-bold);
+}
+
+.credits ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.credits li {
+  color: var(--od-on-surface);
+  font-size: var(--od-text-body-s);
+  font-weight: var(--od-weight-bold);
+  line-height: 1.5;
+}
+
+.credits li a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.credits li p {
+  margin: 0;
+  color: var(--od-on-surface-muted);
+  font-size: var(--od-text-label-m);
+  font-weight: var(--od-weight-regular);
+}
+
+.license {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--od-outline-variant);
+  border-radius: var(--od-radius-full);
+  color: var(--od-on-surface-variant);
+  font-size: var(--od-text-label-s);
+  font-weight: var(--od-weight-bold);
+  white-space: nowrap;
+}
+
+.slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--od-primary);
+}
+
+.value {
+  flex: none;
+  width: 30px;
+  color: var(--od-on-surface-muted);
+  font-size: var(--od-text-body-s);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowIcon {
+    transition: none;
+  }
+}

@@ -1,0 +1,66 @@
+/* States and variants are written inside :where(), so every rule here weighs
+   one class and no more. A class the caller passes in then wins, as long as
+   the caller's styles load after these: import ui/ components before the
+   module's own stylesheet. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  display: flex;
+  gap: var(--od-space-1);
+  color: var(--od-on-surface);
+  font-size: var(--od-text-body-s);
+  font-weight: var(--od-weight-bold);
+}
+
+/* "(선택)" and the like, inside a label. */
+.label em {
+  color: var(--od-on-surface-faint);
+  font-style: normal;
+  font-weight: var(--od-weight-regular);
+}
+
+.labelEnd {
+  margin-left: auto;
+  color: var(--od-on-surface-faint);
+  font-weight: var(--od-weight-regular);
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  height: var(--od-control-l);
+  padding: 0 14px;
+  border: var(--od-border) solid var(--od-primary-outline);
+  border-radius: var(--od-radius-m);
+  background: var(--od-surface);
+  color: var(--od-on-surface);
+  font-family: inherit;
+  /* This size keeps iOS from zooming the page on focus. */
+  font-size: var(--od-text-title-s);
+  outline: none;
+}
+
+.input:where([data-multiline]) {
+  height: auto;
+  padding: var(--od-space-3) 14px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.input:where(:focus) {
+  border-color: var(--od-primary);
+}
+
+.input::placeholder {
+  color: var(--od-on-surface-faint);
+}
+
+.hint {
+  color: var(--od-on-surface-faint);
+  font-size: var(--od-text-label-m);
+}

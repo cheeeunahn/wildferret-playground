@@ -34,7 +34,7 @@
   position: absolute;
   inset: 0 0 auto;
   height: max(var(--waterline), 0px);
-  background: linear-gradient(#9fdcff, #e3f6ff 70%, #fff5f8);
+  background: linear-gradient(var(--od-secondary-container), var(--od-secondary-container-soft) 70%, var(--od-primary-container));
   transition: height var(--dive);
 }
 
@@ -107,7 +107,7 @@
   align-items: center;
   gap: 5px;
   color: rgb(255 255 255 / 0.6);
-  font-size: 10px;
+  font-size: var(--od-text-label-s);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   translate: 0 -50%;
@@ -124,8 +124,8 @@
 }
 
 .ruler li[data-current] {
-  color: #fff;
-  font-weight: 800;
+  color: var(--od-white);
+  font-weight: var(--od-weight-heavy);
 }
 
 .ruler li[data-current]::before {
@@ -181,20 +181,6 @@ button.sub:active img {
   transform: translateX(-50%);
 }
 
-.count {
-  position: absolute;
-  left: 50%;
-  bottom: -6px;
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.92);
-  color: #ff5a96;
-  font-size: 13px;
-  font-weight: 800;
-  transform: translateX(-50%);
-  box-shadow: 0 3px 8px rgb(10 40 80 / 0.25);
-}
-
 .cargo {
   position: absolute;
   top: 2%;
@@ -207,10 +193,9 @@ button.sub:active img {
   display: block;
   width: 54px;
   height: 76px;
-  border: 2px solid #fff;
-  border-radius: 8px;
+  border: 2px solid var(--od-white);
+  border-radius: var(--od-radius-xs);
   overflow: hidden;
-  box-shadow: 0 6px 14px rgb(10 40 80 / 0.3);
 }
 
 .cargoPoster img {
@@ -230,25 +215,65 @@ button.sub:active img {
   animation: bubble 5s ease-in infinite;
 }
 
+/* Two copies of the depth readout, one per background. Each layer covers
+   the scene and is clipped to its side of the waterline, moving with it. */
+.readoutLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: clip-path var(--dive);
+}
+
+.readoutLayer[data-over='sky'] {
+  clip-path: inset(0 0 calc(100% - max(var(--waterline), 0px)) 0);
+  color: var(--od-on-surface);
+}
+
+.readoutLayer[data-over='sea'] {
+  clip-path: inset(max(var(--waterline), 0px) 0 0 0);
+  color: var(--od-white);
+}
+
+/* No box: a small label over a large number, like a gauge reading. */
 .readout {
   position: absolute;
   top: var(--readout-top, 10px);
-  right: 12px;
-  z-index: 5;
+  right: 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 6px 12px;
-  border-radius: 12px;
-  background: rgb(255 255 255 / 0.85);
-  color: #2b3350;
-  font-size: 12px;
-  line-height: 1.35;
+  margin: 0;
+  line-height: 1;
+}
+
+.readout span {
+  font-size: var(--od-text-label-s);
+  font-weight: var(--od-weight-heavy);
+  letter-spacing: 0.12em;
+  opacity: 0.75;
 }
 
 .readout strong {
-  font-size: 17px;
+  margin-top: 3px;
+  font-size: var(--od-text-display);
+  font-weight: var(--od-weight-heavy);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.readout small {
+  margin-left: 2px;
+  font-size: var(--od-text-body-l);
+  font-weight: var(--od-weight-heavy);
+}
+
+/* How many titles got the submarine this deep. */
+.readout em {
+  margin-top: 6px;
+  font-size: var(--od-text-body-s);
+  font-style: normal;
+  font-weight: var(--od-weight-heavy);
 }
 
 @keyframes dip {

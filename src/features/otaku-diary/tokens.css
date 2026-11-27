@@ -1,0 +1,115 @@
+/* The diary's design system, as tokens. Every colour, text size, weight,
+   corner and space in the diary's styles comes from here; a style file that
+   needs a value this file lacks adds a token rather than a literal.
+
+   The structure follows Material Design 3 (colour roles with an "on" colour
+   for what sits on them, a type scale, a shape scale); the values are the
+   diary's own. Shared pieces built from these tokens are in ui/.
+
+   Exempt, because they are drawings rather than interface: the sea's depth
+   gradients, glows and bubbles (SeaScene, SeaLife, Waves, TapRipple), the
+   shadows cast by character art, and text shadows over background art. */
+
+:root {
+  /* ---- colour roles ---- */
+
+  /* Primary: 코토리's pink. Main actions, selection, links. */
+  --od-primary: #ff5a96;
+  --od-on-primary: #fff;
+  --od-primary-soft: #ff8fb8; /* focus rings, the lighter end of a highlight */
+  --od-primary-strong: #d6336c; /* pressed edge; text on the container */
+  --od-primary-outline: #ffb7d2; /* borders of pink-framed surfaces */
+  --od-primary-container: #ffe7f0; /* selected or pressed backgrounds */
+  --od-on-primary-container: #d6336c;
+
+  /* Secondary: the sea and sky. Chrome of the sea screen, page backdrop. */
+  --od-secondary: #1f86c9;
+  --od-secondary-bright: #5fcdea;
+  --od-secondary-deep: #1d5a9e;
+  --od-secondary-container: #9fdcff;
+  --od-secondary-container-soft: #c9ecff;
+  --od-secondary-outline: #bfe3f5;
+  --od-backdrop: #0b1f55; /* behind the phone column on a wide screen */
+
+  /* Tertiary: paper and wood. The bookshelf and the café. */
+  --od-tertiary-surface: #fbf6f0;
+  --od-tertiary-surface-glass: rgb(251 246 240 / 0.94);
+  --od-tertiary-container: #f1e6da;
+  --od-tertiary-outline: #e6d3bd;
+  --od-on-tertiary-variant: #8a7c70;
+  --od-on-tertiary-faint: #b9aea4;
+
+  /* Error: anything that deletes for good. */
+  --od-error: #c2415b;
+  --od-on-error: #fff;
+
+  /* Surfaces and what is written on them, strongest to faintest. */
+  --od-surface: #fff;
+  --od-surface-glass: rgb(255 255 255 / 0.94); /* over art, with blur */
+  --od-surface-dim: #f4f8fd; /* a screen's own background */
+  --od-surface-container: #eef2f8; /* quiet buttons, tracks, wells */
+  --od-inverse-surface: #1b2340;
+  --od-on-surface: #2b3350; /* headings, body */
+  --od-on-surface-variant: #5b6584; /* longer secondary text */
+  --od-on-surface-muted: #7a85a3; /* labels, captions, quiet buttons */
+  --od-on-surface-faint: #a3acc4; /* hints, credits, disabled */
+  --od-outline-variant: #d9deea; /* neutral borders, off tracks */
+  /* A screen may set --od-outline to its own outline colour (the sea screen
+     to --od-secondary-outline, the bookshelf to --od-tertiary-outline);
+     outlined buttons and chips on it then match. Unset, they are neutral. */
+
+  --od-white: #fff; /* text and marks over colour or art */
+  --od-star: #ffb400;
+  --od-scrim: rgb(15 30 70 / 0.5); /* behind sheets and dialogs */
+
+  /* ---- type ---- */
+  /* One family (나눔스퀘어라운드, fonts.css), three weights. */
+  --od-weight-regular: 400;
+  --od-weight-bold: 700;
+  --od-weight-heavy: 800;
+
+  --od-text-label-s: 11px; /* credits, tiny badges */
+  --od-text-label-m: 12px; /* hints, captions */
+  --od-text-body-s: 13px; /* secondary text, small buttons */
+  --od-text-body-m: 14px; /* default body */
+  --od-text-body-l: 15px; /* list titles, settings rows */
+  --od-text-title-s: 16px; /* inputs (16px stops iOS zooming), main buttons */
+  --od-text-title-m: 18px; /* screen and sheet headings, dialogue */
+  --od-text-title-l: 22px;
+  --od-text-display: 30px; /* the title screen, the depth reading */
+
+  /* Icons take their size from font-size (ui/Icon). */
+  --od-icon-s: 18px;
+  --od-icon-m: 22px;
+  --od-icon-l: 34px; /* the stars you tap */
+
+  /* ---- shape ---- */
+  --od-radius-xs: 8px; /* posters */
+  --od-radius-s: 12px; /* rows, inner corners */
+  --od-radius-m: 16px; /* fields, cards, panels, dialogs */
+  --od-radius-l: 24px; /* the top of a sheet */
+  --od-radius-full: 999px; /* buttons, chips, switches; circles use 50% */
+
+  /* ---- space ---- */
+  --od-space-1: 4px;
+  --od-space-2: 8px;
+  --od-space-3: 12px;
+  --od-space-4: 16px;
+  --od-space-5: 24px;
+  --od-gutter: 16px; /* a screen's or sheet's side padding */
+
+  /* ---- controls ---- */
+  --od-control-s: 34px; /* chips, header buttons */
+  --od-control-m: 40px; /* icon buttons */
+  --od-control-l: 50px; /* fields and the buttons beside them */
+  --od-border: 2px; /* framed surfaces and fields */
+  --od-hairline: 1px; /* dividers, quiet outlines */
+
+  /* ---- layers ---- */
+  --od-z-sheet: 50;
+  --od-z-dialog: 60;
+
+  /* ---- motion ---- */
+  --od-motion-fast: 0.15s;
+  --od-motion: 0.2s;
+}

@@ -1,13 +1,13 @@
 .stars {
   display: inline-flex;
   gap: 1px;
-  color: #dfe5f0;
-  font-size: 13px;
+  color: var(--od-outline-variant);
+  font-size: var(--od-text-body-s);
   line-height: 1;
 }
 
 .stars [data-on] {
-  color: #ffb400;
+  color: var(--od-star);
 }
 
 .input {
@@ -22,8 +22,8 @@
   padding: 0;
   border: 0;
   background: none;
-  color: #dfe5f0;
-  font-size: 38px;
+  color: var(--od-outline-variant);
+  font-size: var(--od-icon-l);
   line-height: 1;
   cursor: pointer;
   transition: transform 0.12s ease-out;
@@ -31,7 +31,7 @@
 }
 
 .star[data-on] {
-  color: #ffb400;
+  color: var(--od-star);
 }
 
 .star:active:not(:disabled) {

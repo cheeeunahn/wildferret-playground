@@ -1,0 +1,59 @@
+/* States and variants are written inside :where(), so every rule here weighs
+   one class and no more. A class the caller passes in then wins, as long as
+   the caller's styles load after these: import ui/ components before the
+   module's own stylesheet. */
+
+.button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:where([data-size='s']) {
+  width: 28px;
+  height: 28px;
+  font-size: var(--od-text-label-m);
+}
+
+.button:where([data-size='m']) {
+  width: var(--od-control-s);
+  height: var(--od-control-s);
+  font-size: var(--od-text-body-m);
+}
+
+.button:where([data-size='l']) {
+  width: var(--od-control-m);
+  height: var(--od-control-m);
+  font-size: var(--od-icon-s);
+}
+
+.button:where([data-variant='outlined']) {
+  border: var(--od-border) solid var(--od-outline, var(--od-outline-variant));
+  background: var(--od-surface);
+  color: var(--od-on-surface);
+}
+
+.button:where([data-variant='tonal']) {
+  background: var(--od-surface-container);
+  color: var(--od-on-surface-muted);
+}
+
+.button:where([data-variant='scrim']) {
+  background: var(--od-scrim);
+  color: var(--od-white);
+}
+
+.button:where([data-variant='plain']) {
+  background: none;
+  color: var(--od-on-surface);
+  font-size: var(--od-icon-m);
+}
+
+.button:where(:active:not(:disabled)) {
+  filter: brightness(0.94);
+}

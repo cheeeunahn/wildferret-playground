@@ -1,0 +1,105 @@
+.tile {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* A long press selects the tile; it must not select text or open a menu. */
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* Posters are 2:3, the shape AniList's covers come in. */
+.poster {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--od-radius-s);
+  background: var(--od-outline-variant);
+  /* The plank under each book, as in the list. */
+  box-shadow: 0 4px 0 var(--od-tertiary-outline);
+  transition: transform var(--od-motion-fast) ease-out;
+}
+
+.poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+.tile:active .poster {
+  transform: scale(0.97);
+}
+
+/* Selecting: a ring at the corner, filled and ticked when chosen, and the
+   chosen poster framed in pink. */
+.check {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 2px solid var(--od-white);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.25);
+  color: var(--od-on-primary);
+  font-size: var(--od-text-body-m);
+}
+
+.check[data-on] {
+  border-color: var(--od-primary);
+  background: var(--od-primary);
+}
+
+.tile[aria-pressed='true'] .poster {
+  outline: 3px solid var(--od-primary);
+  outline-offset: -3px;
+}
+
+.tile[aria-pressed='false'] .poster img {
+  opacity: 0.75;
+}
+
+.title {
+  display: -webkit-box;
+  width: 100%;
+  margin-top: 6px;
+  overflow: hidden;
+  color: var(--od-on-surface);
+  font-size: var(--od-text-body-s);
+  font-weight: var(--od-weight-bold);
+  line-height: 1.35;
+  text-align: left;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.stars {
+  font-size: var(--od-text-label-m);
+}
+
+.unrated {
+  color: var(--od-on-tertiary-faint);
+  font-size: var(--od-text-label-s);
+  line-height: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster {
+    transition: none;
+  }
+}
