@@ -55,10 +55,7 @@ jobs:
             This repo is a small React + Vite playground deployed to Cloudflare
             Workers as static assets. Read README.md for its layout: it is
             organised by feature under `src/features/`, and each feature owns its
-            pages, components, data and routes. In `src/features/otaku-diary/`,
-            `domain/` holds pure rules with no React or browser APIs, `data/` is
-            the only code that knows where data lives, and screens get state from
-            hooks rather than touching storage. Before judging a changed hunk, read
+            pages, components, data and routes. Before judging a changed hunk, read
             the full file it lives in and the files it calls into.
 
             Cover, in this order of priority:
