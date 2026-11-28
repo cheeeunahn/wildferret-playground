@@ -1,0 +1,5 @@
+# The anime diary moved to its own site, 다이브로그 (deepdivelog.app).
+# Workers static assets apply this file before not_found_handling.
+/otaku-diary https://deepdivelog.app/ 301
+/otaku-diary/privacy https://deepdivelog.app/privacy 301
+/otaku-diary/ https://deepdivelog.app/ 301
